@@ -1,0 +1,19 @@
+# config.yaml - Centralized parameters for the FT Reactor
+
+targets:
+  c_min: 8
+  c_max: 16
+
+reactor_conditions:
+  temperature_C: 220.0
+  pressure_bar: 25.0
+  inlet_flow_kmol_h: 40608.05
+  ghsv_h_1: 2000
+  h2_co_ratio: 2.0
+  single_pass_conversion: 0.50
+  alpha: 0.84
+
+catalyst:
+  void_fraction: 0.45
+  particle_diameter_m: 0.002
+  density_kg_m3: 800
