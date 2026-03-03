@@ -1,19 +1,33 @@
-# config.yaml - Centralized parameters for the FT Reactor
+# config.yaml - Centralized parameters for the FT Loop Model
 
+# 1. Targets (Required by the Brief)
 targets:
   c_min: 8
   c_max: 16
+  min_target_rate_kgph: 5000.0  # Example minimum production rate
 
-reactor_conditions:
+# 2. Decision Variables (The Brief requires these for optimization)
+decision_variables:
   temperature_C: 220.0
   pressure_bar: 25.0
-  inlet_flow_kmol_h: 40608.05
-  ghsv_h_1: 2000
   h2_co_ratio: 2.0
   single_pass_conversion: 0.50
   alpha: 0.84
+  recycle_ratio: 0.60           # ADDED: Required for loop mass balance
+  purge_fraction: 0.05          # ADDED: Required for loop mass balance
 
-catalyst:
-  void_fraction: 0.45
-  particle_diameter_m: 0.002
-  density_kg_m3: 800
+fixed_parameters:
+  inlet_flow_kmol_h: 40608.05
+  ghsv_h_1: 2000
+  catalyst_void_fraction: 0.64  
+  catalyst_dp_m: 0.00066        
+  tube_di_inch: 1.37            # CHANGED to inches
+  tube_do_inch: 1.50            # CHANGED to inches
+  target_l_tube_m: 9.5          # Kept in meters (standard for bed length)
+
+# 4. Constraints & Limits (Required by the Brief)
+constraints:
+  max_compressor_power_MW: 10.0 # ADDED: Loop energy limit
+  max_shell_diameter_m: 4.0     # Operability bound for the reactor
+  max_T_C: 240.0                # ADDED: Safety limit
+  max_P_bar: 30.0               # ADDED: Safety limit
