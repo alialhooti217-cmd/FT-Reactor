@@ -6,6 +6,7 @@ class FT_Reactor:
         # 1. Pull dynamic decision variables
         self.T_C = config['decision_variables']['temperature_C']
         self.P_bar = config['decision_variables']['pressure_bar']
+        self.h2_co_ratio = config['decision_variables']['h2_co_ratio'] 
         
         # 2. Pull fixed parameters
         self.flow_in = config['fixed_parameters']['inlet_flow_kmol_h']
@@ -23,10 +24,29 @@ class FT_Reactor:
         # 4. Pull Constraints
         self.max_Ds = config['constraints']['max_shell_diameter_m']
         
-        # 5. Set static thermodynamic constants
+        # 5. Set static thermodynamic constants & calculate density
         self.R = 0.08314
         self.mu_Pa_s = 2.0e-5  
-        self.rho = 2.215       # Static for now, will calculate dynamically later
+        self.calculate_gas_density() 
+
+    def calculate_gas_density(self):
+        """Calculates dynamic syngas inlet density (kg/m³) using the Ideal Gas Law."""
+        # Molar masses (kg/kmol)
+        MW_H2 = 2.016
+        MW_CO = 28.01
+        
+        # Mole fractions based on H2/CO ratio
+        y_H2 = self.h2_co_ratio / (self.h2_co_ratio + 1)
+        y_CO = 1 / (self.h2_co_ratio + 1)
+        
+        # Average mixture molecular weight
+        MW_mix = (y_H2 * MW_H2) + (y_CO * MW_CO)
+        
+        # Ideal Gas Law: rho = (P * MW) / (R * T)
+        T_K = self.T_C + 273.15
+        self.rho = (self.P_bar * MW_mix) / (self.R * T_K)
+        
+        return self.rho
 
     def calculate_bed_volume(self):
         """Calculates total required catalyst volume for the entire plant."""
