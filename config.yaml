@@ -11,23 +11,38 @@ decision_variables:
   temperature_C: 220.0
   pressure_bar: 25.0
   h2_co_ratio: 2.0
-  single_pass_conversion: 0.50
+  single_pass_conversion: 0.7702  # Updated to match Colab extents
   alpha: 0.84
-  recycle_ratio: 0.60           # ADDED: Required for loop mass balance
-  purge_fraction: 0.05          # ADDED: Required for loop mass balance
+  recycle_ratio: 0.60           # Required for loop mass balance
+  purge_fraction: 0.05          # Required for loop mass balance
 
+# 3. Fixed Parameters
 fixed_parameters:
   inlet_flow_kmol_h: 40608.05
   ghsv_h_1: 2000
   catalyst_void_fraction: 0.64  
   catalyst_dp_m: 0.00066        
-  tube_di_inch: 1.37            # CHANGED to inches
-  tube_do_inch: 1.50            # CHANGED to inches
-  target_l_tube_m: 9.5          # Kept in meters (standard for bed length)
+  tube_di_inch: 1.37            
+  tube_do_inch: 1.50            
+  # Removed target_l_tube_m as it is now dynamically searched
 
-# 4. Constraints & Limits (Required by the Brief)
+# 4. Kinetics Parameters (NEW: Based on the paper rate law)
+kinetics:
+  k_rate: 0.0339         # mol/(kg_cat·s·MPa)
+  a_ads: 1.185           # MPa^-1
+  rho_cat_kg_m3: 7840.0  # Bulk/catalyst density 
+  Vcat_mode: "max"       # Options: "max", "kinetics", "ghsv"
+
+# 5. Constraints & Limits
 constraints:
-  max_compressor_power_MW: 10.0 # ADDED: Loop energy limit
+  max_compressor_power_MW: 10.0 # Loop energy limit
   max_shell_diameter_m: 4.0     # Operability bound for the reactor
-  max_T_C: 240.0                # ADDED: Safety limit
-  max_P_bar: 30.0               # ADDED: Safety limit
+  max_T_C: 240.0                # Safety limit
+  max_P_bar: 30.0               # Safety limit
+  # NEW: Geometric Search Constraints
+  LD_min: 3.0
+  LD_max: 5.0
+  L_tube_min: 4.0
+  L_tube_max: 16.0
+  L_tube_step: 0.5
+  N_max_search: 12
