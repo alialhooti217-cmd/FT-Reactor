@@ -1,48 +1,62 @@
-# config.yaml - Centralized parameters for the FT Loop Model
-
-# 1. Targets (Required by the Brief)
-targets:
-  c_min: 8
-  c_max: 16
-  min_target_rate_kgph: 5000.0  # Example minimum production rate
-
-# 2. Decision Variables (The Brief requires these for optimization)
-decision_variables:
+operating_conditions:
   temperature_C: 220.0
   pressure_bar: 25.0
-  h2_co_ratio: 2.0
-  single_pass_conversion: 0.7702  # Updated to match Colab extents
-  alpha: 0.84
-  recycle_ratio: 0.60           # Required for loop mass balance
-  purge_fraction: 0.05          # Required for loop mass balance
+  compressibility_factor: 1.0
 
-# 3. Fixed Parameters
-fixed_parameters:
-  inlet_flow_kmol_h: 40608.05
-  ghsv_h_1: 2000
-  catalyst_void_fraction: 0.64  
-  catalyst_dp_m: 0.00066        
-  tube_di_inch: 1.37            
-  tube_do_inch: 1.50            
-  # Removed target_l_tube_m as it is now dynamically searched
+feed:
+  total_flow_kmol_h: 1000 ##40608.05
 
-# 4. Kinetics Parameters (NEW: Based on the paper rate law)
-kinetics:
-  k_rate: 0.0339         # mol/(kg_cat·s·MPa)
-  a_ads: 1.185           # MPa^-1
-  rho_cat_kg_m3: 7840.0  # Bulk/catalyst density 
-  Vcat_mode: "max"       # Options: "max", "kinetics", "ghsv"
+  composition:
+    H2: 0.9413
+    CO: 0.0399
+    CO2: 0.0097
+    H2O: 0.0012
+    C1: 0.0073
+    C3: 0.0011
+    C6: 0.0001
+    C11: 0.0
+    C18: 0.0
 
-# 5. Constraints & Limits
-constraints:
-  max_compressor_power_MW: 10.0 # Loop energy limit
-  max_shell_diameter_m: 4.0     # Operability bound for the reactor
-  max_T_C: 240.0                # Safety limit
-  max_P_bar: 30.0               # Safety limit
-  # NEW: Geometric Search Constraints
+target_x_co: 0.8
+
+design_basis:
+  ghsv_h: 2000
+  max_shell_diameter_m: 4.0
+  reactors_max_search: 12
+
+geometry_constraints:
   LD_min: 3.0
   LD_max: 5.0
-  L_tube_min: 4.0
-  L_tube_max: 16.0
-  L_tube_step: 0.5
-  N_max_search: 12
+  tube_length_min_m: 4.0
+  tube_length_max_m: 16.0
+  tube_length_step_m: 0.5
+
+reactor_geometry:
+  tube_inner_diameter_m: 0.0348
+  tube_outer_diameter_m: 0.0380
+  bundle_clearance_m: 0.097
+
+bed_properties:
+  void_fraction: 0.64
+  particle_diameter_m: 0.00066
+  gas_viscosity_Pa_s: 2.0e-5
+
+kinetics:
+  rate_constant: 0.0339
+  adsorption_constant: 1.185
+  catalyst_density_kg_m3: 7840
+  catalyst_volume_mode: "max"
+
+reaction_extents_kmol_h:
+  C1: 260.5129105
+  C3: 57.61741815
+  C6: 37.82304527
+  C11: 42.61473710
+  C18: 6.55611340
+
+dh_kj_per_kmol:
+  C1: -206166
+  C3: -498588
+  C6: -954876
+  C11: -1714556
+  C18: -2777928
