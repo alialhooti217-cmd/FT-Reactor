@@ -1,5 +1,6 @@
 # src/utilities.py
-##Marwan check here!!!!
+import math
+
 # =========================
 # THERMODYNAMIC CONSTANTS
 # =========================
@@ -53,10 +54,30 @@ def ideal_gas_density(P_bar: float, T_K: float, mw_mix: float, Z: float = 1.0) -
     R = 8.314e3  # Pa·m3/(kmol·K)
     return (P_Pa * mw_mix) / (Z * R * T_K)
 
-
 # =========================
 # ASF DISTRIBUTION MODELS
 # =========================
+
+def calculate_dynamic_alpha(T_C: float, h2_co_ratio: float, asf_params: dict) -> float:
+    """
+    Dynamically calculates chain growth probability (alpha) based on reactor 
+    temperature and H2/CO ratio using Arrhenius kinetics.
+    """
+    ka = asf_params.get('ka', 0.157)
+    beta = asf_params.get('beta', 0.28)
+    Ea = asf_params.get('Ea_J_mol', 30100.0)
+    
+    T_K = T_C + 273.15
+    T_ref_K = 220.0 + 273.15  # Reference temperature from Excel
+    R = 8.314
+    
+    # Calculate temperature-dependent k_a
+    k_T = ka * math.exp((Ea / R) * (1.0 / T_ref_K - 1.0 / T_K))
+    
+    # Calculate alpha
+    alpha = 1.0 / (1.0 + k_T * (h2_co_ratio ** beta))
+    
+    return alpha
 
 def get_pure_alkane_mw(n: int) -> float:
     """Calculates the standard molecular weight of a linear alkane (C_n H_2n+2)."""
