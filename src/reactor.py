@@ -8,7 +8,7 @@ and optimization-ready outputs.
 import dataclasses
 from typing import Dict, Any
 
-from src.constants import MW, CARBON_NUMBER, TUBE_BUNDLE
+from src.constants import MW, TUBE_BUNDLE
 from src.thermo import gas_density, volumetric_flow_m3_h, cp_mixture_kj_kmolk
 from src.kinetics import kinetic_rate_kmol_m3_s, catalyst_volume_from_kinetics
 from src.geometry import search_geometry
@@ -124,11 +124,22 @@ class FTReactor:
         self.max_superficial_velocity = config.get("max_superficial_velocity_m_s", 5.0)
         self.max_delta_p_bar = config.get("max_delta_p_bar", 5.0)
 
+        # Keep these for future detailed chemistry / ASF linkage if needed
         self.reaction_extents = config.get("reaction_extents_kmol_h", {})
         self.dh_kj_per_kmol = config.get("dh_kj_per_kmol", {})
 
+        # New: effective heat per kmol CO converted for dataset generation
+        # Negative because FT is exothermic
+        self.effective_ft_heat_kj_per_kmol_co = config.get(
+            "effective_ft_heat_kj_per_kmol_co",
+            -165000.0,
+        )
+
     def _total_inlet_flow(self) -> float:
         return sum(self.feed_composition.values())
+
+    def _co_inlet_flow(self) -> float:
+        return self.feed_composition.get("CO", 0.0)
 
     def _calculate_gas_density(self) -> float:
         return gas_density(
@@ -167,14 +178,40 @@ class FTReactor:
         return fh2 / fco
 
     def _co_consumed_from_extents(self) -> float:
+        """
+        Retained only for fallback / debugging.
+        Not used as the main dataset KPI anymore.
+        """
         co_consumed = 0.0
+        carbon_number = {
+            "C1": 1,
+            "C2": 2,
+            "C3": 3,
+            "C4": 4,
+            "C5": 5,
+            "C6": 6,
+            "C7": 7,
+            "C8": 8,
+            "C9": 9,
+            "C10": 10,
+            "C11": 11,
+            "C12": 12,
+            "C13": 13,
+            "C14": 14,
+            "C15": 15,
+            "C16": 16,
+            "C17": 17,
+            "C18": 18,
+            "C19": 19,
+            "C20": 20,
+        }
         for comp, extent in self.reaction_extents.items():
-            if comp in CARBON_NUMBER:
-                co_consumed += CARBON_NUMBER[comp] * extent
+            if comp in carbon_number:
+                co_consumed += carbon_number[comp] * extent
         return co_consumed
 
     def _estimate_co_conversion_from_extents(self) -> float:
-        fco_in = self.feed_composition.get("CO", 0.0)
+        fco_in = self._co_inlet_flow()
         if fco_in <= 0.0:
             return 0.0
         x_co = self._co_consumed_from_extents() / fco_in
@@ -184,6 +221,10 @@ class FTReactor:
         if self.target_x_co is not None:
             return max(0.0, min(self.target_x_co, 0.999999))
         return self._estimate_co_conversion_from_extents()
+
+    def _co_consumed_from_conversion(self, x_co: float) -> float:
+        fco_in = self._co_inlet_flow()
+        return max(0.0, x_co * fco_in)
 
     def _calculate_bed_volume(self, rco_kmol_m3_s: float):
         total_vol_flow_m3_h = self._calculate_total_volumetric_flow()
@@ -212,11 +253,12 @@ class FTReactor:
 
         return cat_volume_total, vcat_ghsv, vcat_kin, sizing_mode, x_co
 
-    def _calculate_heat_release(self):
-        q_rxn_kj_h = 0.0
-        for comp, extent in self.reaction_extents.items():
-            dh = self.dh_kj_per_kmol.get(comp, 0.0)
-            q_rxn_kj_h += extent * dh
+    def _calculate_heat_release(self, co_consumed_kmol_h: float):
+        """
+        Simple responsive heat model for batch dataset generation.
+        Uses an effective heat per kmol CO converted instead of fixed extents.
+        """
+        q_rxn_kj_h = co_consumed_kmol_h * self.effective_ft_heat_kj_per_kmol_co
         q_rxn_mw = q_rxn_kj_h / 3.6e6
         return q_rxn_kj_h, q_rxn_mw
 
@@ -299,7 +341,8 @@ class FTReactor:
         superficial_velocity_m_s = total_vol_flow_m3_h / 3600.0 / geometry.At_m2
         reactor_volume_total = cat_volume_total / (1.0 - self.eps)
 
-        q_rxn_kj_h, q_rxn_mw = self._calculate_heat_release()
+        co_consumed_kmol_h = self._co_consumed_from_conversion(x_co)
+        q_rxn_kj_h, q_rxn_mw = self._calculate_heat_release(co_consumed_kmol_h)
         delta_t_ad_C = self._calculate_adiabatic_delta_t(q_rxn_kj_h, cp_mix)
 
         feasible, reason = self._check_feasibility(
@@ -325,7 +368,7 @@ class FTReactor:
             cp_mix_kj_kmolk=cp_mix,
             rco_kmol_m3_s=rco_kmol_m3_s,
             x_co=x_co,
-            co_consumed_kmol_h=self._co_consumed_from_extents(),
+            co_consumed_kmol_h=co_consumed_kmol_h,
             q_rxn_kj_h=q_rxn_kj_h,
             q_rxn_mw=q_rxn_mw,
             delta_t_ad_C=delta_t_ad_C,
@@ -351,6 +394,9 @@ def run_case(config: dict, feed_composition: dict) -> dict:
     row["input_pressure_bar"] = config["operating_conditions"]["pressure_bar"]
     row["input_ghsv_h"] = config["design_basis"]["ghsv_h"]
     row["input_target_x_co"] = config.get("target_x_co", None)
+
+    row["input_total_flow_kmol_h"] = config["feed"]["total_flow_kmol_h"]
+
     row["input_tube_inner_diameter_m"] = config["reactor_geometry"]["tube_inner_diameter_m"]
     row["input_particle_diameter_m"] = config["bed_properties"]["particle_diameter_m"]
     row["input_void_fraction"] = config["bed_properties"]["void_fraction"]
