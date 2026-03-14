@@ -351,6 +351,8 @@ def run_case(config: dict, feed_composition: dict | None = None) -> dict:
     reactor = FTReactor(config=config, feed_composition=feed_composition)
     results = reactor.run()
     row = results.to_dict()
+
+    # Input features for surrogate model
     row["input_temperature_C"] = config["operating_conditions"]["temperature_C"]
     row["input_pressure_bar"] = config["operating_conditions"]["pressure_bar"]
     row["input_ghsv_h"] = config["design_basis"]["ghsv_h"]
@@ -361,4 +363,21 @@ def run_case(config: dict, feed_composition: dict | None = None) -> dict:
     row["input_void_fraction"] = config["bed_properties"]["void_fraction"]
     row["input_reactors_max_search"] = config["design_basis"]["reactors_max_search"]
     row["input_purge_fraction"] = config.get("loop_configuration", {}).get("purge_fraction", 0.05)
+
+    # Optional consistency check for ML target columns
+    required_targets = [
+        "target_rate_kgph",
+        "target_fraction",
+        "specific_energy_kwh_per_kg_target",
+        "compressor_power_mw",
+        "cooling_duty_mw",
+        "delta_p_bar",
+    ]
+
+    missing_targets = [col for col in required_targets if col not in row]
+    if missing_targets:
+        raise KeyError(
+            f"run_case() is missing required target columns for surrogate training: {missing_targets}"
+        )
+
     return row

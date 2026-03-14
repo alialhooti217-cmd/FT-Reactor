@@ -125,39 +125,50 @@ kpi_definitions:
 dataset_generation:
   sampling_method: stratified_random
   random_seed: 42
-  n_cases: 250
+  n_cases: 12000
   tube_wall_thickness_m: 0.0032
   output_dataset_csv: data/processed/dataset.csv
+  output_feasible_dataset_csv: data/processed/dataset_feasible.csv
   output_run_metadata_json: data/processed/run_metadata.json
   output_model_dir: models
+  output_plots_dir: plots
   ranges:
     temperature_C:
       min: 210.0
-      max: 240.0
+      max: 235.0
+
     pressure_bar:
       min: 20.0
       max: 28.0
+
     ghsv_h:
       min: 1500.0
       max: 2200.0
+
     target_x_co:
       min: 0.60
       max: 0.78
+
     total_flow_kmol_h:
       min: 900.0
       max: 1800.0
+
     tube_inner_diameter_m:
       min: 0.0400
-      max: 0.0480
+      max: 0.0460
+
     particle_diameter_m:
-      min: 0.00100
-      max: 0.00160
+      min: 0.00110
+      max: 0.00150
+
     void_fraction:
-      min: 0.40
-      max: 0.48
+      min: 0.41
+      max: 0.46
+
     purge_fraction:
       min: 0.020
-      max: 0.080
+      max: 0.060
+
     reactors_max_search:
-      min: 14
+      min: 16
       max: 24

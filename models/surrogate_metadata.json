@@ -1,13 +1,16 @@
 {
-  "timestamp": "2026-03-14T15:47:20.032008+00:00",
+  "timestamp": "2026-03-14T17:18:22.020543+00:00",
   "random_seed": 42,
-  "n_cases_requested": 250,
-  "n_cases_completed": 250,
+  "n_cases_requested": 12000,
+  "n_cases_completed": 12000,
+  "n_success": 12000,
+  "n_failed": 0,
+  "n_feasible": 5989,
   "sampling_method": "stratified_random",
   "ranges": {
     "temperature_C": {
       "min": 210.0,
-      "max": 240.0
+      "max": 235.0
     },
     "pressure_bar": {
       "min": 20.0,
@@ -27,22 +30,22 @@
     },
     "tube_inner_diameter_m": {
       "min": 0.04,
-      "max": 0.048
+      "max": 0.046
     },
     "particle_diameter_m": {
-      "min": 0.001,
-      "max": 0.0016
+      "min": 0.0011,
+      "max": 0.0015
     },
     "void_fraction": {
-      "min": 0.4,
-      "max": 0.48
+      "min": 0.41,
+      "max": 0.46
     },
     "purge_fraction": {
       "min": 0.02,
-      "max": 0.08
+      "max": 0.06
     },
     "reactors_max_search": {
-      "min": 14,
+      "min": 16,
       "max": 24
     }
   },
@@ -61,6 +64,14 @@
     "max_delta_p_bar": 4.0,
     "min_target_fraction": 0.08
   },
+  "output_files": {
+    "dataset_all_csv": "data/processed/dataset.csv",
+    "dataset_feasible_csv": "data/processed/dataset_feasible.csv",
+    "run_metadata_json": "data/processed/run_metadata.json",
+    "model_dir": "models",
+    "plots_dir": "plots"
+  },
+  "training_rows": 5989,
   "feature_columns": [
     "input_temperature_C",
     "input_pressure_bar",
@@ -78,38 +89,44 @@
     "specific_energy_kwh_per_kg_target",
     "compressor_power_mw",
     "cooling_duty_mw",
-    "delta_p_bar",
+    "delta_p_bar"
+  ],
+  "optional_target_columns": [
     "feasible_numeric"
   ],
-  "n_training_rows": 250,
+  "model_type": "MultiOutputRegressor(ExtraTreesRegressor)",
+  "n_training_rows": 5989,
+  "n_train_rows_split": 4791,
+  "n_validation_rows_split": 1198,
   "metrics": {
     "target_rate_kgph": {
-      "mae": 7.910895931921635,
-      "r2": 0.9932647810233682
+      "mae": 2.437976093188729,
+      "r2": 0.9993727266825545
     },
     "target_fraction": {
-      "mae": 0.00028861439838956756,
-      "r2": 0.9959826600089952
+      "mae": 3.5918825960423534e-05,
+      "r2": 0.9998891661438932
     },
     "specific_energy_kwh_per_kg_target": {
-      "mae": 0.18677051471264192,
-      "r2": 0.9808361439698855
+      "mae": 0.026977193677973715,
+      "r2": 0.9992383272736196
     },
     "compressor_power_mw": {
-      "mae": 0.017358909282441472,
-      "r2": 0.9938518656873749
+      "mae": 0.006147983136014368,
+      "r2": 0.9990142947658083
     },
     "cooling_duty_mw": {
-      "mae": 0.12059153150881158,
-      "r2": 0.9981800816101131
+      "mae": 0.03102962357498974,
+      "r2": 0.9998687702849962
     },
     "delta_p_bar": {
-      "mae": 1.5152359944056772,
-      "r2": 0.9068421522591047
-    },
-    "feasible_numeric": {
-      "mae": 0.12762333333333337,
-      "r2": 0.7780701638052984
+      "mae": 0.1411391221263997,
+      "r2": 0.9567461232638529
     }
+  },
+  "artifacts": {
+    "model_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_model.joblib",
+    "metadata_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_metadata.json",
+    "training_data_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_training_data.csv"
   }
 }
