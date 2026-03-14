@@ -1,8 +1,6 @@
-"""
-main.py
--------
-Run the FT reactor model using a YAML configuration file.
-"""
+"""Run the FT loop model using a YAML configuration file."""
+
+from __future__ import annotations
 
 import yaml
 
@@ -11,36 +9,29 @@ from src.reactor import FTReactor, run_case
 
 
 def load_config(yaml_path: str) -> dict:
-    """Load YAML configuration."""
     with open(yaml_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def main():
-
-    # Load YAML config
     config = load_config("config.yaml")
-
-    # Build feed stream from YAML
     feed_total = build_total_feed(config)
-
-    # Map YAML conversion field if using reaction_model block
-    if "reaction_model" in config:
-        config["target_x_co"] = config["reaction_model"].get("target_co_conversion", None)
-
-    # Run reactor model
     reactor = FTReactor(config=config, feed_composition=feed_total)
-
     results = reactor.run()
-
     print(results.summary())
-
-    # Generate dataset row (for ML / optimization)
     row = run_case(config=config, feed_composition=feed_total)
-
-    print("\nDataset row:")
-    for k, v in row.items():
-        print(f"{k}: {v}")
+    print("\nDataset-style row preview:")
+    for key in [
+        "target_rate_kgph",
+        "target_fraction",
+        "specific_energy_kwh_per_kg_target",
+        "compressor_power_mw",
+        "cooling_duty_mw",
+        "delta_p_bar",
+        "feasible",
+        "violation_reason",
+    ]:
+        print(f"{key}: {row.get(key)}")
 
 
 if __name__ == "__main__":

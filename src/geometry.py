@@ -81,15 +81,6 @@ def penalty(value: float, low: float, high: float) -> float:
 
 
 def _selection_score(result: GeometryResult) -> tuple:
-    """
-    Lower is better.
-    Prefer:
-      1) lower penalty
-      2) fewer parallel reactors
-      3) fewer tubes per reactor
-      4) shorter tube length
-      5) smaller shell diameter
-    """
     return (
         result.penalty,
         result.N,
@@ -133,7 +124,6 @@ def search_geometry(
         raise ValueError("N_max_search must be at least 1.")
 
     v_reactor_total = cat_volume_total / (1.0 - eps)
-
     valid_results = []
     best_compromise = None
 

@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-03-14T15:47:20.032008+00:00",
+  "random_seed": 42,
+  "n_cases_requested": 250,
+  "n_cases_completed": 250,
+  "sampling_method": "stratified_random",
+  "ranges": {
+    "temperature_C": {
+      "min": 210.0,
+      "max": 240.0
+    },
+    "pressure_bar": {
+      "min": 20.0,
+      "max": 28.0
+    },
+    "ghsv_h": {
+      "min": 1500.0,
+      "max": 2200.0
+    },
+    "target_x_co": {
+      "min": 0.6,
+      "max": 0.78
+    },
+    "total_flow_kmol_h": {
+      "min": 900.0,
+      "max": 1800.0
+    },
+    "tube_inner_diameter_m": {
+      "min": 0.04,
+      "max": 0.048
+    },
+    "particle_diameter_m": {
+      "min": 0.001,
+      "max": 0.0016
+    },
+    "void_fraction": {
+      "min": 0.4,
+      "max": 0.48
+    },
+    "purge_fraction": {
+      "min": 0.02,
+      "max": 0.08
+    },
+    "reactors_max_search": {
+      "min": 14,
+      "max": 24
+    }
+  },
+  "kpis": {
+    "primary_objective": "specific_energy_kwh_per_kg_target",
+    "kpis": [
+      "target_rate_kgph",
+      "target_fraction",
+      "specific_energy_kwh_per_kg_target",
+      "compressor_power_mw",
+      "cooling_duty_mw",
+      "delta_p_bar"
+    ]
+  },
+  "constraints": {
+    "max_delta_p_bar": 4.0,
+    "min_target_fraction": 0.08
+  }
+}
