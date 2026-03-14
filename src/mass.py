@@ -1,159 +1,23 @@
-##code for mass balance &ASF
-import math
+"""Mass-balance helpers for the FT loop model."""
+
+from __future__ import annotations
+
+from typing import Dict, Tuple
+
+from src.constants import MW
 
 
-def asf_weight_fraction(alpha, n):
-    """
-    Anderson-Schulz-Flory mass fraction for carbon number n.
-
-    Wn = n * (1 - alpha)^2 * alpha^(n - 1)
-
-    Parameters
-    ----------
-    alpha : float
-        Chain growth probability (0 < alpha < 1)
-    n : int
-        Carbon number
-
-    Returns
-    -------
-    float
-        ASF weight fraction for carbon number n
-    """
-    if not (0.0 < alpha < 1.0):
-        raise ValueError("alpha must be between 0 and 1.")
-    if n < 1:
-        raise ValueError("Carbon number n must be >= 1.")
-
-    return n * ((1.0 - alpha) ** 2) * (alpha ** (n - 1))
-
-
-def asf_distribution(alpha, n_max):
-    """
-    Generate ASF distribution from C1 to Cn_max.
-
-    Returns
-    -------
-    dict
-        {carbon_number: fraction}
-    """
-    dist = {}
-    for n in range(1, n_max + 1):
-        dist[n] = asf_weight_fraction(alpha, n)
-
-    total = sum(dist.values())
-    if total <= 0:
-        raise ValueError("ASF distribution sum is zero.")
-
-    # Normalize so fractions sum to 1 over truncated range
-    for n in dist:
-        dist[n] /= total
-
-    return dist
-
-
-def range_fraction(distribution, c_min, c_max):
-    """
-    Sum ASF fraction over target carbon range.
-    """
-    if c_min < 1 or c_max < c_min:
-        raise ValueError("Invalid carbon range.")
-
-    return sum(frac for n, frac in distribution.items() if c_min <= n <= c_max)
-
-
-def co_reacted_from_conversion(feed, x_co):
-    """
-    Calculate reacted CO flow from target CO conversion.
-
-    Parameters
-    ----------
-    feed : dict
-        Feed in kmol/h
-    x_co : float
-        CO conversion
-
-    Returns
-    -------
-    float
-        Reacted CO in kmol/h
-    """
-    fco_in = feed.get("CO", 0.0)
-    return fco_in * x_co
-
-
-def product_molar_flows_from_co_conversion(feed, x_co, alpha, n_max):
-    """
-    Convert reacted CO into hydrocarbon product molar flows using ASF.
-
-    Assumption:
-    - All hydrocarbons are paraffins CnH2n+2
-    - ASF fractions are used on a carbon basis
-
-    Logic:
-    - Total reacted CO = total reacted carbon atoms
-    - Carbon allocated to each n using ASF fraction
-    - Product molar flow of Cn = carbon allocated to n / n
-
-    Returns
-    -------
-    dict
-        {
-            "distribution": {n: fraction},
-            "products_kmol_h": {"C1": ..., "C2": ..., ...},
-            "co_reacted_kmol_h": ...,
-        }
-    """
-    distribution = asf_distribution(alpha, n_max)
-    co_reacted = co_reacted_from_conversion(feed, x_co)
-
-    products = {}
-    for n, frac in distribution.items():
-        carbon_to_n = co_reacted * frac
-        product_flow = carbon_to_n / n
-        products[f"C{n}"] = product_flow
-
-    return {
-        "distribution": distribution,
-        "products_kmol_h": products,
-        "co_reacted_kmol_h": co_reacted,
-    }
-
-
-def component_balances(products_kmol_h):
-    """
-    Compute stoichiometric balances for paraffin FT products.
-
-    Stoichiometry:
-        n CO + (2n+1) H2 -> CnH2n+2 + n H2O
-
-    For each 1 kmol of Cn produced:
-    - CO consumed = n
-    - H2 consumed = 2n + 1
-    - H2O formed = n
-
-    Returns
-    -------
-    dict
-        {
-            "CO_consumed_kmol_h": ...,
-            "H2_consumed_kmol_h": ...,
-            "H2O_formed_kmol_h": ...
-        }
-    """
+def component_balances(products_kmol_h: Dict[str, float]) -> dict:
     co_consumed = 0.0
     h2_consumed = 0.0
     h2o_formed = 0.0
-
     for comp, flow in products_kmol_h.items():
         if not comp.startswith("C"):
             continue
-
         n = int(comp[1:])
         co_consumed += n * flow
         h2_consumed += (2 * n + 1) * flow
         h2o_formed += n * flow
-
     return {
         "CO_consumed_kmol_h": co_consumed,
         "H2_consumed_kmol_h": h2_consumed,
@@ -161,85 +25,68 @@ def component_balances(products_kmol_h):
     }
 
 
-def outlet_stream(feed, products_kmol_h):
-    """
-    Calculate reactor outlet stream based on feed and FT stoichiometry.
-
-    Returns
-    -------
-    dict
-        Outlet stream in kmol/h
-    """
+def apply_ft_stoichiometry(inlet_stream: Dict[str, float], products_kmol_h: Dict[str, float]) -> Tuple[dict, dict]:
     balances = component_balances(products_kmol_h)
-
-    out = dict(feed)
-
-    out["CO"] = feed.get("CO", 0.0) - balances["CO_consumed_kmol_h"]
-    out["H2"] = feed.get("H2", 0.0) - balances["H2_consumed_kmol_h"]
-    out["H2O"] = feed.get("H2O", 0.0) + balances["H2O_formed_kmol_h"]
-
+    outlet = dict(inlet_stream)
+    outlet["CO"] = max(0.0, inlet_stream.get("CO", 0.0) - balances["CO_consumed_kmol_h"])
+    outlet["H2"] = max(0.0, inlet_stream.get("H2", 0.0) - balances["H2_consumed_kmol_h"])
+    outlet["H2O"] = inlet_stream.get("H2O", 0.0) + balances["H2O_formed_kmol_h"]
     for comp, flow in products_kmol_h.items():
-        out[comp] = out.get(comp, 0.0) + flow
+        outlet[comp] = outlet.get(comp, 0.0) + flow
+    return outlet, balances
 
-    return out
+
+def separator_split(outlet_stream: Dict[str, float], gas_split: Dict[str, float]) -> Tuple[dict, dict]:
+    gas, liquid = {}, {}
+    for comp, flow in outlet_stream.items():
+        frac_to_gas = gas_split.get(comp)
+        if frac_to_gas is None:
+            frac_to_gas = 1.0 if comp in {"H2", "CO", "CO2", "N2", "Ar"} else 0.0
+        frac_to_gas = max(0.0, min(frac_to_gas, 1.0))
+        gas[comp] = flow * frac_to_gas
+        liquid[comp] = flow * (1.0 - frac_to_gas)
+    return gas, liquid
 
 
-def target_range_production(products_kmol_h, c_min, c_max):
-    """
-    Calculate total production in a selected carbon range.
+def recycle_and_purge(gas_stream: Dict[str, float], purge_fraction: float) -> Tuple[dict, dict]:
+    purge_fraction = max(0.0, min(purge_fraction, 0.95))
+    recycle = {comp: flow * (1.0 - purge_fraction) for comp, flow in gas_stream.items()}
+    purge = {comp: flow * purge_fraction for comp, flow in gas_stream.items()}
+    return recycle, purge
 
-    Returns
-    -------
-    float
-        Total target-range production in kmol/h
-    """
-    total = 0.0
-    for comp, flow in products_kmol_h.items():
-        if comp.startswith("C"):
-            n = int(comp[1:])
-            if c_min <= n <= c_max:
-                total += flow
+
+def combine_streams(*streams: Dict[str, float]) -> dict:
+    total: Dict[str, float] = {}
+    for stream in streams:
+        for comp, flow in stream.items():
+            total[comp] = total.get(comp, 0.0) + flow
     return total
 
 
-def ft_mass_balance(feed, x_co, alpha, n_max, c_min, c_max):
-    """
-    Full FT mass-balance workflow.
-
-    Returns
-    -------
-    dict
-        {
-            "distribution": ...,
-            "products_kmol_h": ...,
-            "co_reacted_kmol_h": ...,
-            "balances": ...,
-            "outlet_stream_kmol_h": ...,
-            "target_range_fraction": ...,
-            "target_range_production_kmol_h": ...
-        }
-    """
-    result = product_molar_flows_from_co_conversion(
-        feed=feed,
-        x_co=x_co,
-        alpha=alpha,
-        n_max=n_max,
-    )
-
-    distribution = result["distribution"]
-    products = result["products_kmol_h"]
-
-    balances = component_balances(products)
-    out = outlet_stream(feed, products)
-    target_frac = range_fraction(distribution, c_min, c_max)
-    target_prod = target_range_production(products, c_min, c_max)
-
+def target_range_metrics(products_kmol_h: Dict[str, float], c_min: int, c_max: int) -> dict:
+    target_kmol_h = 0.0
+    target_kg_h = 0.0
+    total_kg_h = 0.0
+    for comp, flow in products_kmol_h.items():
+        if not comp.startswith("C"):
+            continue
+        mw = MW.get(comp, 0.0)
+        mass_rate = flow * mw
+        total_kg_h += mass_rate
+        n = int(comp[1:])
+        if c_min <= n <= c_max:
+            target_kmol_h += flow
+            target_kg_h += mass_rate
+    target_fraction = target_kg_h / total_kg_h if total_kg_h > 0 else 0.0
     return {
-        "distribution": distribution,
-        "products_kmol_h": products,
-        "co_reacted_kmol_h": result["co_reacted_kmol_h"],
-        "balances": balances,
-        "outlet_stream_kmol_h": out,
-        "target_range_fraction": target_frac,
-        "target_range_production_kmol_h": target_prod,
+        "target_rate_kgph": target_kg_h,
+        "target_rate_kmolph": target_kmol_h,
+        "target_fraction": target_fraction,
+        "total_hydrocarbon_rate_kgph": total_kg_h,
     }
+
+
+def assert_nonnegative_stream(stream: Dict[str, float], name: str) -> None:
+    bad = {k: v for k, v in stream.items() if v < -1e-9}
+    if bad:
+        raise ValueError(f"Negative flows detected in {name}: {bad}")
