@@ -1,0 +1,174 @@
+operating_conditions:
+  temperature_C: 220.0
+  pressure_bar: 25.0
+  compressibility_factor: 1.0
+
+feed:
+  total_flow_kmol_h: 1200.0
+  composition:
+    H2: 0.6600
+    CO: 0.3000
+    CO2: 0.0200
+    H2O: 0.0000
+    N2: 0.0200
+    Ar: 0.0000
+    C1: 0.0000
+    C2: 0.0000
+    C3: 0.0000
+    C4: 0.0000
+    C5: 0.0000
+    C6: 0.0000
+    C7: 0.0000
+    C8: 0.0000
+    C9: 0.0000
+    C10: 0.0000
+    C11: 0.0000
+    C12: 0.0000
+    C13: 0.0000
+    C14: 0.0000
+    C15: 0.0000
+    C16: 0.0000
+    C17: 0.0000
+    C18: 0.0000
+    C19: 0.0000
+    C20: 0.0000
+
+target_x_co: 0.72
+
+design_basis:
+  ghsv_h: 1800.0
+  max_shell_diameter_m: 4.0
+  reactors_max_search: 18
+  max_delta_p_bar: 4.0
+  min_superficial_velocity_m_s: 0.05
+  max_superficial_velocity_m_s: 4.0
+  min_target_fraction: 0.08
+
+geometry_constraints:
+  LD_min: 3.0
+  LD_max: 6.0
+  tube_length_min_m: 4.0
+  tube_length_max_m: 10.0
+  tube_length_step_m: 0.5
+
+reactor_geometry:
+  tube_inner_diameter_m: 0.0420
+  tube_outer_diameter_m: 0.0452
+  bundle_clearance_m: 0.0970
+
+bed_properties:
+  void_fraction: 0.42
+  particle_diameter_m: 0.00120
+  gas_viscosity_Pa_s: 2.0e-5
+
+kinetics:
+  rate_constant: 0.0339
+  adsorption_constant: 1.185
+  catalyst_density_kg_m3: 7840.0
+  catalyst_volume_mode: "max"
+
+loop_configuration:
+  purge_fraction: 0.030
+  compressor_pressure_ratio: 1.08
+  compressor_efficiency: 0.75
+  max_loop_iterations: 50
+  loop_tolerance: 1.0e-6
+  separator_gas_split:
+    H2: 1.0
+    CO: 1.0
+    CO2: 1.0
+    N2: 1.0
+    Ar: 1.0
+    H2O: 0.03
+    C1: 1.0
+    C2: 1.0
+    C3: 0.20
+    C4: 0.05
+    C5: 0.01
+
+asf_model:
+  ka: 0.157
+  beta0: 0.28
+  Ea_J_mol: 30100.0
+  T_ref_K: 493.15
+  y1: 0.632898507303832
+  y2: 0.0447425425659602
+  nmax: 20
+
+heat_of_reaction:
+  dh_ref_kj_per_kmol_co: -165000.0
+  t_ref_C: 220.0
+  delta_cp_kj_per_kmolco_K: 35.0
+
+target_product:
+  c_min: 8
+  c_max: 16
+
+kpi_definitions:
+  primary_objective: specific_energy_kwh_per_kg_target
+  kpis:
+    - target_rate_kgph
+    - target_fraction
+    - specific_energy_kwh_per_kg_target
+    - compressor_power_mw
+    - cooling_duty_mw
+    - delta_p_bar
+
+# Task 2: YAML-driven experiments
+# To keep pressure drop below 4 bar, the most important adjustable YAML knobs are:
+#   design_basis.max_delta_p_bar
+#   reactor_geometry.tube_inner_diameter_m
+#   geometry_constraints.tube_length_max_m
+#   design_basis.reactors_max_search
+#   bed_properties.particle_diameter_m
+
+dataset_generation:
+  sampling_method: stratified_random
+  random_seed: 42
+  n_cases: 12000
+  tube_wall_thickness_m: 0.0032
+  output_dataset_csv: data/processed/dataset.csv
+  output_feasible_dataset_csv: data/processed/dataset_feasible.csv
+  output_run_metadata_json: data/processed/run_metadata.json
+  output_model_dir: models
+  output_plots_dir: plots
+  ranges:
+    temperature_C:
+      min: 210.0
+      max: 235.0
+
+    pressure_bar:
+      min: 20.0
+      max: 28.0
+
+    ghsv_h:
+      min: 1500.0
+      max: 2200.0
+
+    target_x_co:
+      min: 0.60
+      max: 0.78
+
+    total_flow_kmol_h:
+      min: 900.0
+      max: 1800.0
+
+    tube_inner_diameter_m:
+      min: 0.0400
+      max: 0.0460
+
+    particle_diameter_m:
+      min: 0.00110
+      max: 0.00150
+
+    void_fraction:
+      min: 0.41
+      max: 0.46
+
+    purge_fraction:
+      min: 0.020
+      max: 0.060
+
+    reactors_max_search:
+      min: 16
+      max: 24
