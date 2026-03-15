@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-03-14T17:18:22.020543+00:00",
+  "timestamp": "2026-03-14T19:48:47.874938+00:00",
   "random_seed": 42,
-  "n_cases_requested": 12000,
-  "n_cases_completed": 12000,
-  "n_success": 12000,
+  "n_cases_requested": 21000,
+  "n_cases_completed": 21000,
+  "n_success": 21000,
   "n_failed": 0,
-  "n_feasible": 5989,
+  "n_feasible": 10527,
   "sampling_method": "stratified_random",
   "ranges": {
     "temperature_C": {
@@ -71,7 +71,7 @@
     "model_dir": "models",
     "plots_dir": "plots"
   },
-  "training_rows": 5989,
+  "training_rows": 10527,
   "feature_columns": [
     "input_temperature_C",
     "input_pressure_bar",
@@ -95,33 +95,33 @@
     "feasible_numeric"
   ],
   "model_type": "MultiOutputRegressor(ExtraTreesRegressor)",
-  "n_training_rows": 5989,
-  "n_train_rows_split": 4791,
-  "n_validation_rows_split": 1198,
+  "n_training_rows": 10527,
+  "n_train_rows_split": 8421,
+  "n_validation_rows_split": 2106,
   "metrics": {
     "target_rate_kgph": {
-      "mae": 2.437976093188729,
-      "r2": 0.9993727266825545
+      "mae": 2.322522863107846,
+      "r2": 0.9998284479130539
     },
     "target_fraction": {
-      "mae": 3.5918825960423534e-05,
-      "r2": 0.9998891661438932
+      "mae": 2.4265589603218755e-05,
+      "r2": 0.9999179125695834
     },
     "specific_energy_kwh_per_kg_target": {
-      "mae": 0.026977193677973715,
-      "r2": 0.9992383272736196
+      "mae": 0.005201673499287403,
+      "r2": 0.9993207580226637
     },
     "compressor_power_mw": {
-      "mae": 0.006147983136014368,
-      "r2": 0.9990142947658083
+      "mae": 0.00491832240411721,
+      "r2": 0.9993475931719148
     },
     "cooling_duty_mw": {
-      "mae": 0.03102962357498974,
-      "r2": 0.9998687702849962
+      "mae": 0.024882530413755995,
+      "r2": 0.9999101711917361
     },
     "delta_p_bar": {
-      "mae": 0.1411391221263997,
-      "r2": 0.9567461232638529
+      "mae": 0.11796115606772505,
+      "r2": 0.9699755804599889
     }
   },
   "artifacts": {
