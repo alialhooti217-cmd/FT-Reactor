@@ -1,3 +1,9 @@
+"""Quick smoke test for the trained surrogate model.
+
+Loads the saved model and runs a single prediction with hard-coded inputs
+to verify the model file is valid and produces reasonable outputs.
+"""
+
 from pathlib import Path
 import joblib
 import json

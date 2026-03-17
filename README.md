@@ -26,8 +26,11 @@ The code is designed for **modularity, reproducibility, and integration with mac
 ```
 FT-Reactor/
 ├── README.md
+├── requirements.txt                 ← Python dependencies
 ├── config.yaml                      ← central configuration file
 ├── main.py                          ← entry point for single simulations
+├── run_interactive.py               ← interactive CLI for user-defined inputs
+├── visualize.py                     ← generates 2D and 3D plots from the dataset
 ├── Copy_of_FT_Reactor.ipynb         ← standalone prototype sizing notebook
 │
 ├── src/                             ← core simulation modules
@@ -47,10 +50,10 @@ FT-Reactor/
 │
 ├── ml/
 │   ├── surrogate.py                 ← ML model training (ExtraTreesRegressor)
-│   ├── optimize_surrogate.py        ← optimization via trained surrogate
-│   ├── plots.py                     ← visualization utilities
-│   ├── test_surrogate.py
-│   └── verify_optimum.py
+│   ├── optimize_surrogate.py        ← optimisation via trained surrogate
+│   ├── plots.py                     ← ML-specific plot utilities
+│   ├── test_surrogate.py            ← surrogate smoke test
+│   └── verify_optimum.py            ← verify surrogate optimum with full sim
 │
 ├── tests/
 │   └── test_sanity.py               ← unit tests
@@ -61,8 +64,18 @@ FT-Reactor/
 │       ├── dataset_feasible.csv     ← 10,527 feasible cases (~7 MB)
 │       └── run_metadata.json        ← generation metadata and KPI definitions
 │
-└── models/
-    └── surrogate_metadata.json      ← ML model performance metrics
+├── models/
+│   └── surrogate_metadata.json      ← ML model performance metrics
+│
+└── plots/                           ← generated visualisations (2D and 3D)
+    ├── 01_feasibility_map.png
+    ├── 02_pressure_drop_histogram.png
+    ├── 03_conversion_vs_selectivity.png
+    ├── 04_energy_vs_production.png
+    ├── 05_kpi_correlation_heatmap.png
+    ├── 06_3d_energy_landscape.png
+    ├── 07_3d_selectivity_map.png
+    └── 08_3d_pressure_drop.png
 ```
 
 ---
@@ -171,6 +184,18 @@ python main.py
 
 All parameters are controlled through `config.yaml` at the project root.
 
+### Interactive Mode
+
+For a guided experience where you enter parameters one by one:
+
+```bash
+python run_interactive.py
+```
+
+The script prompts for each parameter with its valid range and default value.
+Press Enter to accept defaults, or type a value. Results are displayed in a
+formatted summary including geometry, hydraulics, energy, and feasibility.
+
 ---
 
 # Key Configuration Parameters (`config.yaml`)
@@ -230,6 +255,30 @@ The trained model and metadata will be saved to `models/`.
 
 ---
 
+# Visualisations
+
+Generate all 2D and 3D plots from the simulation dataset:
+
+```bash
+python visualize.py
+```
+
+This produces 8 plots in the `plots/` directory:
+
+**2D plots:**
+1. **Feasibility map** — Temperature vs Pressure coloured by feasible/infeasible
+2. **Pressure-drop histogram** — distribution with the 4-bar constraint line
+3. **Conversion vs selectivity** — CO conversion vs C8–C16 fraction, coloured by temperature
+4. **Energy vs production** — specific energy vs product rate, coloured by pressure
+5. **KPI correlation heatmap** — pairwise correlations between all inputs and outputs
+
+**3D plots:**
+6. **Energy landscape** — T x P x GHSV coloured by specific energy
+7. **Selectivity map** — T x P x CO conversion coloured by C8–C16 fraction
+8. **Pressure-drop surface** — T x P x pressure drop
+
+---
+
 # Testing
 
 Run the unit tests with:
@@ -268,7 +317,7 @@ Possible extensions include:
 * catalyst deactivation modeling
 * advanced optimization algorithms (genetic algorithms, Bayesian optimization)
 * uncertainty quantification
-* `requirements.txt` and `pyproject.toml` for packaging
+* `pyproject.toml` packaging and distribution
 
 ---
 

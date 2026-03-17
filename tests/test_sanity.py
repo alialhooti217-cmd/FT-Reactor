@@ -1,3 +1,10 @@
+"""Sanity checks for the FT reactor simulation.
+
+Verifies that the base-case configuration runs without errors, respects
+the pressure-drop limit, and that adjustments to particle diameter and
+purge fraction produce the expected directional effects.
+"""
+
 from __future__ import annotations
 
 import copy
@@ -21,6 +28,7 @@ def load_config() -> dict:
 
 
 def run_checks() -> None:
+    """Run three sanity checks: base-case feasibility, Ergun direction, purge effect."""
     cfg = load_config()
     base = FTReactor(cfg, build_total_feed(cfg)).run()
     assert base.delta_p_bar <= cfg['design_basis']['max_delta_p_bar'] + 1e-9, 'Base case should satisfy max delta P'
