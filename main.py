@@ -9,11 +9,13 @@ from src.reactor import FTReactor, run_case
 
 
 def load_config(yaml_path: str) -> dict:
+    """Load a YAML configuration file and return its contents as a dict."""
     with open(yaml_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def main():
+    """Run a single FT reactor simulation using the base config and print results."""
     config = load_config("config.yaml")
     feed_total = build_total_feed(config)
     reactor = FTReactor(config=config, feed_composition=feed_total)

@@ -1,3 +1,9 @@
+"""Plotting utilities for FT reactor simulation results and surrogate models.
+
+Generates feasibility scatter plots, pressure-drop histograms, feature
+importance bar charts, and predicted-vs-actual validation plots.
+"""
+
 from __future__ import annotations
 
 import json
@@ -36,6 +42,17 @@ def plot_feasibility_scatter(
     x_col: str = "input_temperature_C",
     y_col: str = "input_pressure_bar",
 ) -> str:
+    """Generate a scatter plot of feasible vs infeasible design points.
+
+    Args:
+        df: DataFrame with ``feasible`` column and the two axis columns.
+        out_dir: Directory to save the plot.
+        x_col: Column name for x-axis.
+        y_col: Column name for y-axis.
+
+    Returns:
+        Path to the saved PNG file.
+    """
     out_dir = Path(out_dir)
     _ensure_dir(out_dir)
 
@@ -73,6 +90,16 @@ def plot_delta_p_histogram(
     out_dir: str | Path,
     delta_p_limit: float | None = None,
 ) -> str:
+    """Generate a histogram of pressure drops with an optional limit line.
+
+    Args:
+        df: DataFrame containing a ``delta_p_bar`` column.
+        out_dir: Directory to save the plot.
+        delta_p_limit: If given, draws a vertical dashed line at this value.
+
+    Returns:
+        Path to the saved PNG file.
+    """
     out_dir = Path(out_dir)
     _ensure_dir(out_dir)
 
@@ -104,6 +131,16 @@ def plot_feature_importance(
     out_dir: str | Path,
     target_index: int = 0,
 ) -> str:
+    """Generate a bar chart of feature importances for a specific target.
+
+    Args:
+        model_path: Path to the trained surrogate model (joblib).
+        out_dir: Directory to save the plot.
+        target_index: Index into the trained target list (0-based).
+
+    Returns:
+        Path to the saved PNG file.
+    """
     out_dir = Path(out_dir)
     _ensure_dir(out_dir)
 
@@ -146,6 +183,18 @@ def plot_predicted_vs_actual(
     out_dir: str | Path,
     target_cols: list[str] | None = None,
 ) -> list[str]:
+    """Generate predicted-vs-actual scatter plots for each target column.
+
+    Args:
+        model_path: Path to the trained surrogate model (joblib).
+        training_data_path: Path to the training CSV data.
+        out_dir: Directory to save the plots.
+        target_cols: List of target column names to plot. Defaults to
+            ``DEFAULT_TARGETS_TO_PLOT``.
+
+    Returns:
+        List of paths to the saved PNG files.
+    """
     out_dir = Path(out_dir)
     _ensure_dir(out_dir)
 

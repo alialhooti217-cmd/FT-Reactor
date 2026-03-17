@@ -1,6 +1,6 @@
 # Fischer–Tropsch Reactor Simulation and Optimization
 
-This repository contains a **Python-based modular simulation framework for a Fischer–Tropsch (FT) reactor**, developed as part of an **IR4 engineering project**.
+This repository contains a **Python-based modular simulation framework for a Fischer–Tropsch (FT) reactor**, developed as part of an **IR4 engineering project** at Sultan Qaboos University.
 
 The project combines **process modeling, dataset generation, machine learning, and optimization** to explore reactor performance and operating conditions.
 
@@ -12,10 +12,10 @@ The Fischer–Tropsch process converts **syngas (CO + H₂)** into hydrocarbons 
 
 This project provides a computational framework to:
 
-* simulate FT reactor behavior
+* simulate FT reactor behavior (including recycle loop convergence)
 * generate large datasets from parametric studies
-* train surrogate models
-* perform optimization of reactor performance
+* train surrogate models (ML-based fast approximations)
+* perform optimization of reactor operating conditions
 
 The code is designed for **modularity, reproducibility, and integration with machine learning workflows**.
 
@@ -25,119 +25,135 @@ The code is designed for **modularity, reproducibility, and integration with mac
 
 ```
 FT-Reactor/
-│
 ├── README.md
-├── requirements.txt
-├── pyproject.toml
+├── requirements.txt                 ← Python dependencies
+├── config.yaml                      ← central configuration file
+├── main.py                          ← entry point for single simulations
+├── run_interactive.py               ← interactive CLI for user-defined inputs
+├── visualize.py                     ← generates 2D and 3D plots from the dataset
+├── Copy_of_FT_Reactor.ipynb         ← standalone prototype sizing notebook
 │
-├── configs/
-│   ├── training.yaml
-│   └── user_job.yaml
+├── src/                             ← core simulation modules
+│   ├── constants.py                 ← molecular weights, ASF params, thermo data
+│   ├── asf.py                       ← Anderson-Schulz-Flory distribution model
+│   ├── feed.py                      ← feed composition normalization
+│   ├── geometry.py                  ← reactor geometry sizing and search
+│   ├── hydraulics.py                ← Ergun pressure drop calculations
+│   ├── kinetics.py                  ← kinetic rate law and catalyst volume
+│   ├── mass.py                      ← mass balance and stoichiometry
+│   ├── thermo.py                    ← thermodynamic calculations
+│   ├── utilities.py                 ← helper functions (ASF, Cp, MW)
+│   └── reactor.py                   ← main FTReactor class and recycle loop
 │
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── models/
+├── batch/
+│   └── run_batch.py                 ← dataset generation from parameter ranges
 │
-├── notebooks/
-│   └── ft_reactor_exploration.ipynb
-│
-├── src/
-│   └── ft_reactor/
-│       ├── __init__.py
-│       ├── constants.py
-│       ├── asf.py
-│       ├── mass_balance.py
-│       ├── energy.py
-│       ├── model.py
-│       ├── batch_runner.py
-│       ├── surrogate.py
-│       ├── optimizer.py
-│       └── io_utils.py
+├── ml/
+│   ├── surrogate.py                 ← ML model training (ExtraTreesRegressor)
+│   ├── optimize_surrogate.py        ← optimisation via trained surrogate
+│   ├── plots.py                     ← ML-specific plot utilities
+│   ├── test_surrogate.py            ← surrogate smoke test
+│   └── verify_optimum.py            ← verify surrogate optimum with full sim
 │
 ├── tests/
-│   ├── test_asf.py
-│   ├── test_mass_balance.py
-│   └── test_model.py
+│   └── test_sanity.py               ← unit tests
 │
-└── main.py
+├── data/
+│   └── processed/
+│       ├── dataset.csv              ← all 21,000 simulation cases (~15 MB)
+│       ├── dataset_feasible.csv     ← 10,527 feasible cases (~7 MB)
+│       └── run_metadata.json        ← generation metadata and KPI definitions
+│
+├── models/
+│   └── surrogate_metadata.json      ← ML model performance metrics
+│
+└── plots/                           ← generated visualisations (2D and 3D)
+    ├── 01_feasibility_map.png
+    ├── 02_pressure_drop_histogram.png
+    ├── 03_conversion_vs_selectivity.png
+    ├── 04_energy_vs_production.png
+    ├── 05_kpi_correlation_heatmap.png
+    ├── 06_3d_energy_landscape.png
+    ├── 07_3d_selectivity_map.png
+    └── 08_3d_pressure_drop.png
 ```
 
 ---
 
 # Key Features
 
-### 1️⃣ Reactor Model
+### 1. Reactor Model
 
-The core simulation includes:
+The core simulation (`src/reactor.py`) implements a full multitubular fixed-bed FT reactor with recycle loop convergence. It calls:
 
-* mass balances
-* energy balances
-* ASF distribution for hydrocarbon products
-* thermodynamic calculations
-* configurable reactor conditions
+| Module | Responsibility |
+|--------|---------------|
+| `src/asf.py` | Anderson-Schulz-Flory hydrocarbon product distribution |
+| `src/mass.py` | Stoichiometry, recycle/purge, gas-liquid separation |
+| `src/thermo.py` | Mixture MW, density, heat capacity, heat of reaction |
+| `src/kinetics.py` | CO conversion rate law, catalyst volume |
+| `src/geometry.py` | Tube bundle sizing, shell diameter, L/D search |
+| `src/hydraulics.py` | Ergun equation pressure drop |
+| `src/feed.py` | Feed composition normalization |
+| `src/constants.py` | Species properties, global constants |
 
-Main modules:
+The recycle loop converges when stream flows stabilize to within `loop_tol = 1e-6` (configurable), with a maximum of 50 iterations.
 
-```
-mass_balance.py
-energy.py
-asf.py
-model.py
-```
+**Feasibility criteria checked after each simulation:**
 
----
-
-### 2️⃣ Batch Simulation Engine
-
-The framework allows automated generation of datasets using multiple reactor configurations.
-
-Implemented in:
-
-```
-batch_runner.py
-configs/training.yaml
-```
-
-Typical workflow:
-
-1. Define parameter ranges in YAML
-2. Run multiple simulations
-3. Save results for ML training
+* ΔP ≤ `max_delta_p_bar` (default 4.0 bar)
+* Shell diameter Ds ≤ `max_shell_diameter_m` (default 4.0 m)
+* L/D in `[ld_min, ld_max]` (default 3.0–6.0)
+* Superficial velocity in `[v_min, v_max]` (default 0.05–4.0 m/s)
+* C8–C16 molar fraction ≥ `min_target_fraction` (default 0.08)
 
 ---
 
-### 3️⃣ Machine Learning Surrogate Model
+### 2. Batch Simulation Engine
 
-A surrogate model approximates the reactor simulation to enable faster evaluation during optimization.
+Generates datasets by sampling parameter combinations and running simulations in bulk.
 
-Implemented in:
-
-```
-surrogate.py
+```bash
+python batch/run_batch.py
 ```
 
-Capabilities include:
+Workflow:
+1. Stratified random sampling from 10 parameter ranges (seed 42)
+2. Each case runs a full `FTReactor` simulation
+3. Results saved to `data/processed/dataset.csv` (all cases) and `data/processed/dataset_feasible.csv` (feasible only)
 
-* training surrogate models
-* saving trained models
-* prediction from trained models
+**Current dataset:** 21,000 simulated cases → 10,527 feasible (50.1%)
 
 ---
 
-### 4️⃣ Optimization Module
+### 3. Machine Learning Surrogate Model
 
-The optimizer searches for reactor operating conditions that improve selected objectives such as:
+A surrogate model approximates the reactor simulation output to enable fast evaluation during optimization.
 
-* hydrocarbon yield
-* selectivity
-* energy efficiency
-
-Implemented in:
-
+```bash
+python -m ml.surrogate
 ```
-optimizer.py
+
+**Architecture:** `MultiOutputRegressor(ExtraTreesRegressor(n_estimators=300))`
+
+| | |
+|---|---|
+| **Input features (9)** | Temperature, pressure, GHSV, target_x_co, total flow, tube_Di, particle_Di, void_fraction, purge_fraction |
+| **Output targets (6)** | target_rate_kgph, target_fraction, specific_energy_kwh_per_kg_target, compressor_power_mw, cooling_duty_mw, delta_p_bar |
+| **Training split** | 80% train / 20% validation (from 10,527 feasible cases) |
+| **Saved to** | `models/` |
+
+---
+
+### 4. Optimization Module
+
+Uses the trained surrogate to rapidly search for operating conditions that minimize the primary objective (`specific_energy_kwh_per_kg_target` by default).
+
+```bash
+python -m ml.optimize_surrogate
 ```
+
+Samples large numbers of input combinations and predicts outputs using the surrogate — far faster than running full simulations.
 
 ---
 
@@ -160,33 +176,57 @@ pip install -r requirements.txt
 
 # Running the Simulation
 
-Run the main simulation script:
+Run a single simulation using the base configuration:
 
 ```bash
 python main.py
 ```
 
-Configuration can be modified in:
+All parameters are controlled through `config.yaml` at the project root.
 
+### Interactive Mode
+
+For a guided experience where you enter parameters one by one:
+
+```bash
+python run_interactive.py
 ```
-configs/user_job.yaml
-```
+
+The script prompts for each parameter with its valid range and default value.
+Press Enter to accept defaults, or type a value. Results are displayed in a
+formatted summary including geometry, hydraulics, energy, and feasibility.
+
+---
+
+# Key Configuration Parameters (`config.yaml`)
+
+| Parameter | Default | Tunable Range | Description |
+|-----------|---------|---------------|-------------|
+| `temperature_c` | 220 | 210–235 °C | Reactor temperature |
+| `pressure_bar` | 25 | 20–28 bar | Operating pressure |
+| `ghsv` | 1800 | 1500–2200 h⁻¹ | Gas hourly space velocity |
+| `total_flow_kmol_h` | 1200 | 900–1800 kmol/h | Fresh feed total molar flow |
+| `target_x_co` | 0.72 | 0.60–0.78 | Target single-pass CO conversion |
+| `tube_Di_m` | 0.042 | 0.040–0.046 m | Tube inner diameter |
+| `particle_Di_m` | 0.0012 | 0.0011–0.0015 m | Catalyst particle diameter |
+| `void_fraction` | 0.42 | 0.41–0.46 | Bed void fraction |
+| `purge_fraction` | 0.03 | 0.02–0.06 | Recycle purge fraction |
+| `max_delta_p_bar` | 4.0 | — | Max allowed pressure drop |
+| `max_shell_diameter_m` | 4.0 | — | Max reactor shell diameter |
 
 ---
 
 # Running Batch Simulations
 
-To generate datasets for training surrogate models:
-
 ```bash
-python -m src.ft_reactor.batch_runner
+python batch/run_batch.py
 ```
 
 This will:
-
-1. Sample reactor operating conditions
-2. Run simulations
-3. Store outputs in `data/processed/`
+1. Sample reactor operating conditions from the ranges in `config.yaml`
+2. Run simulations in sequence
+3. Save all results to `data/processed/dataset.csv`
+4. Save feasible-only results to `data/processed/dataset_feasible.csv`
 
 ---
 
@@ -195,42 +235,77 @@ This will:
 After generating simulation data:
 
 ```bash
-python -m src.ft_reactor.surrogate
+python -m ml.surrogate
 ```
 
-The trained model will be stored in:
+The trained model and metadata will be saved to `models/`.
 
+---
+
+# KPI Definitions
+
+| KPI | Description |
+|-----|-------------|
+| `target_rate_kgph` | Mass flow rate of C8–C16 hydrocarbon products (kg/h) |
+| `target_fraction` | Molar fraction of C8–C16 in all hydrocarbon products |
+| `specific_energy_kwh_per_kg_target` | Energy consumption per kg of C8–C16 produced (primary optimization objective) |
+| `compressor_power_mw` | Recycle compressor electrical power (MW) |
+| `cooling_duty_mw` | Reactor cooling duty required (MW) |
+| `delta_p_bar` | Pressure drop across the packed bed (bar) |
+
+---
+
+# Visualisations
+
+Generate all 2D and 3D plots from the simulation dataset:
+
+```bash
+python visualize.py
 ```
-data/models/
-```
+
+This produces 8 plots in the `plots/` directory:
+
+**2D plots:**
+1. **Feasibility map** — Temperature vs Pressure coloured by feasible/infeasible
+2. **Pressure-drop histogram** — distribution with the 4-bar constraint line
+3. **Conversion vs selectivity** — CO conversion vs C8–C16 fraction, coloured by temperature
+4. **Energy vs production** — specific energy vs product rate, coloured by pressure
+5. **KPI correlation heatmap** — pairwise correlations between all inputs and outputs
+
+**3D plots:**
+6. **Energy landscape** — T x P x GHSV coloured by specific energy
+7. **Selectivity map** — T x P x CO conversion coloured by C8–C16 fraction
+8. **Pressure-drop surface** — T x P x pressure drop
 
 ---
 
 # Testing
 
-Unit tests ensure correctness of key model components.
-
-Run tests with:
+Run the unit tests with:
 
 ```bash
 pytest
 ```
 
+Tests in `tests/test_sanity.py` verify pressure drop limits, particle diameter effects, and purge fraction behavior.
+
 ---
 
-# Notebook Exploration
+# Prototype Notebook
 
-Interactive analysis is available in:
+An interactive sizing prototype is available in:
 
 ```
-notebooks/ft_reactor_exploration.ipynb
+Copy_of_FT_Reactor.ipynb
 ```
 
-This notebook demonstrates:
+This notebook was used to develop and validate the reactor sizing algorithm before it was refactored into the `src/` modules. It is useful for:
 
-* running simulations
-* exploring output trends
-* validating model behavior
+* manually exploring individual design cases
+* verifying geometry and hydraulics calculations
+* understanding the N-sensitivity scan (parallel reactors)
+
+> **Note:** The logic in this notebook has been superseded by the modular source code in `src/`. For production use, run `main.py` or `batch/run_batch.py`.
 
 ---
 
@@ -238,11 +313,11 @@ This notebook demonstrates:
 
 Possible extensions include:
 
-* detailed reactor hydrodynamics
+* multi-objective optimization (Pareto front for yield vs. energy)
 * catalyst deactivation modeling
-* process integration with recycle loops
-* advanced optimization algorithms
+* advanced optimization algorithms (genetic algorithms, Bayesian optimization)
 * uncertainty quantification
+* `pyproject.toml` packaging and distribution
 
 ---
 

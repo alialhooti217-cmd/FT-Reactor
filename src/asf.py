@@ -13,6 +13,20 @@ from src.constants import ASF_DEFAULTS
 
 
 def dynamic_alpha(T_C: float, h2_co_ratio: float, params: dict | None = None) -> float:
+    """Calculate the ASF chain growth probability alpha at the given conditions.
+
+    Uses an Arrhenius-type expression:
+        alpha = 1 / (1 + ka * (H2/CO)^beta0 * exp((Ea/R)*(1/T_ref - 1/T)))
+
+    Args:
+        T_C: Reactor temperature in degrees Celsius.
+        h2_co_ratio: Molar H2/CO ratio at the reactor inlet.
+        params: Optional dict to override any key in ``ASF_DEFAULTS``
+            (``ka``, ``beta0``, ``Ea_J_mol``, ``T_ref_K``).
+
+    Returns:
+        Chain growth probability alpha, clamped to (1e-6, 0.999999).
+    """
     params = {**ASF_DEFAULTS, **(params or {})}
     ka = params["ka"]
     beta0 = params["beta0"]
@@ -27,6 +41,24 @@ def dynamic_alpha(T_C: float, h2_co_ratio: float, params: dict | None = None) ->
 
 
 def modified_asf_distribution(alpha: float, nmax: int = 20, params: dict | None = None) -> Dict[int, float]:
+    """Compute the modified ASF molar distribution from C1 to C{nmax}.
+
+    Applies empirical offsets (y1, y2 from ``params``) to the standard
+    Anderson-Schulz-Flory chain-length distribution so that light-gas
+    selectivity matches experimental data.
+
+    Args:
+        alpha: Chain growth probability (0 < alpha < 1).
+        nmax: Highest carbon number to include. Defaults to 20.
+        params: Optional overrides for ASF parameters (``y1``, ``y2``).
+
+    Returns:
+        Dict mapping carbon number n → normalised mole fraction.
+
+    Raises:
+        ValueError: If alpha is outside (0, 1), nmax < 2, or internal
+            denominators collapse.
+    """
     params = {**ASF_DEFAULTS, **(params or {})}
     y1 = params["y1"]
     y2 = params["y2"]

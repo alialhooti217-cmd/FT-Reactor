@@ -1,3 +1,10 @@
+"""Surrogate-based reactor optimisation.
+
+Loads a trained surrogate model and randomly samples the input space to find
+operating conditions that minimise ``specific_energy_kwh_per_kg_target``
+subject to pressure-drop and target-fraction constraints.
+"""
+
 from __future__ import annotations
 
 import json
@@ -15,10 +22,12 @@ CONFIG_PATH = Path("config.yaml")
 
 
 def load_json(path: Path) -> dict:
+    """Load and parse a JSON file, returning its contents as a dict."""
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def load_yaml_config(path: Path) -> dict:
+    """Load and parse a YAML configuration file."""
     import yaml
 
     with open(path, "r", encoding="utf-8") as f:
@@ -26,6 +35,7 @@ def load_yaml_config(path: Path) -> dict:
 
 
 def sample_input(ranges: dict, rng: random.Random) -> dict:
+    """Generate a single random input sample within the configured parameter ranges."""
     return {
         "input_temperature_C": rng.uniform(
             ranges["temperature_C"]["min"],
@@ -67,6 +77,7 @@ def sample_input(ranges: dict, rng: random.Random) -> dict:
 
 
 def main() -> None:
+    """Run the surrogate-based optimisation loop and save the best result."""
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
 

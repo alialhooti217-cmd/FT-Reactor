@@ -1,3 +1,11 @@
+"""Verify a surrogate-predicted optimum with a full reactor simulation.
+
+Loads the best operating conditions found by ``optimize_surrogate.py``,
+injects them into the base configuration, runs a real ``FTReactor``
+simulation, and prints the true outputs side-by-side with the surrogate
+predictions so the user can assess surrogate fidelity.
+"""
+
 from pathlib import Path
 import json
 import yaml
@@ -25,7 +33,7 @@ def load_yaml(path):
 
 
 def main():
-
+    """Load the surrogate optimum, run a full simulation, and print results."""
     if not OPTIMUM_PATH.exists():
         raise FileNotFoundError("Run optimization first!")
 

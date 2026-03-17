@@ -1,4 +1,8 @@
-"""Surrogate-model training helpers for Task 2."""
+"""Surrogate-model training pipeline.
+
+Trains a ``MultiOutputRegressor(ExtraTreesRegressor)`` on the feasible
+simulation dataset and saves the model, metadata, and training data.
+"""
 
 from __future__ import annotations
 
@@ -39,12 +43,25 @@ OPTIONAL_TARGET_COLUMNS = [
 
 
 def _check_required_columns(df: pd.DataFrame, columns: list[str], label: str) -> None:
+    """Raise KeyError if any of *columns* are missing from *df*."""
     missing = [col for col in columns if col not in df.columns]
     if missing:
         raise KeyError(f"Missing {label} columns in dataset: {missing}")
 
 
 def prepare_training_frame(df: pd.DataFrame) -> pd.DataFrame:
+    """Filter and clean a raw dataset DataFrame for surrogate training.
+
+    Keeps only rows that are both successful and feasible, replaces
+    infinite values with NaN, drops rows with missing required columns,
+    and adds a ``feasible_numeric`` column for optional classification.
+
+    Args:
+        df: Raw dataset DataFrame (e.g. loaded from ``dataset.csv``).
+
+    Returns:
+        Cleaned DataFrame ready for train/test splitting.
+    """
     train_df = df.copy()
 
     if "run_status" in train_df.columns:
@@ -74,6 +91,28 @@ def _safe_r2(y_true: pd.Series, y_pred: pd.Series) -> float:
 
 
 def train_and_save_surrogate(df: pd.DataFrame, out_dir: str | Path, metadata: dict) -> dict:
+    """Train the surrogate model on *df* and persist all artefacts.
+
+    Steps:
+    1. Prepare and clean the dataset via :func:`prepare_training_frame`.
+    2. Split into 80% train / 20% validation.
+    3. Fit a ``MultiOutputRegressor(ExtraTreesRegressor(300))`` model.
+    4. Evaluate MAE and R-squared on the validation set.
+    5. Save the joblib model, training CSV, and metadata JSON to *out_dir*.
+
+    Args:
+        df: Raw or pre-filtered DataFrame with all feature and target columns.
+        out_dir: Directory to write model artefacts to.
+        metadata: Base metadata dict (e.g. from run_metadata) merged into
+            the saved metadata JSON.
+
+    Returns:
+        Dict with ``model_path``, ``metadata_path``, ``training_data_path``,
+        ``metrics``, and row-count summaries.
+
+    Raises:
+        ValueError: If fewer than 25 usable rows are available.
+    """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 

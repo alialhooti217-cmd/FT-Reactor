@@ -1,3 +1,11 @@
+"""Batch dataset generation for the FT reactor surrogate model.
+
+Samples parameter combinations from ranges defined in ``config.yaml``,
+runs a full ``FTReactor`` simulation for each case, saves the results
+as CSV datasets (all cases and feasible-only), trains the surrogate
+model, and generates diagnostic plots.
+"""
+
 from __future__ import annotations
 
 import copy
@@ -67,6 +75,17 @@ def _stratified_samples(
 
 
 def sample_cases(base_config: dict) -> list[dict]:
+    """Generate a list of config dicts, each with a unique parameter sample.
+
+    Uses stratified random sampling across all parameter ranges defined
+    in ``config["dataset_generation"]["ranges"]``.
+
+    Args:
+        base_config: Full YAML configuration dict.
+
+    Returns:
+        List of deep-copied config dicts, one per sampled case.
+    """
     dg = base_config.get("dataset_generation", {})
     n_cases = int(dg.get("n_cases", 250))
     random_seed = int(dg.get("random_seed", 42))
@@ -147,6 +166,16 @@ def sample_cases(base_config: dict) -> list[dict]:
 
 
 def build_run_metadata(config: dict, df_all: pd.DataFrame, df_feasible: pd.DataFrame) -> dict:
+    """Assemble a metadata dict summarising the batch run for JSON export.
+
+    Args:
+        config: Full YAML configuration dict.
+        df_all: DataFrame of all simulation results (success + failed).
+        df_feasible: DataFrame of feasible-only results.
+
+    Returns:
+        Metadata dict with timestamps, counts, ranges, KPIs, and file paths.
+    """
     dg = config.get("dataset_generation", {})
     constraints = {
         "max_delta_p_bar": config.get("design_basis", {}).get("max_delta_p_bar", 4.0),
@@ -196,6 +225,11 @@ def build_run_metadata(config: dict, df_all: pd.DataFrame, df_feasible: pd.DataF
 
 
 def run_batch(config_path: str = "config.yaml") -> None:
+    """Execute the full batch pipeline: simulate, train surrogate, plot.
+
+    Args:
+        config_path: Relative path to the YAML config file.
+    """
     full_config_path = PROJECT_ROOT / config_path
     print(f"Loading config from: {full_config_path}")
     config = load_yaml(full_config_path)
