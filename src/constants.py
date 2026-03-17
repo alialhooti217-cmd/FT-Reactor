@@ -54,6 +54,17 @@ def paraffin_mw(n_carbon: int) -> float:
 
 
 def build_mw_dict(nmax: int = 20) -> Dict[str, float]:
+    """Build a molecular weight dictionary for all relevant species up to C{nmax}.
+
+    Includes permanent gases (H2, CO, CO2, H2O, N2, Ar) and linear paraffins
+    C1 through C{nmax} using the ``paraffin_mw`` formula.
+
+    Args:
+        nmax: Highest carbon number to include. Defaults to 20.
+
+    Returns:
+        Dict mapping species name (e.g. ``"C5"``) to MW in kg/kmol.
+    """
     mw = {
         "H2": 2.016,
         "CO": 28.01,

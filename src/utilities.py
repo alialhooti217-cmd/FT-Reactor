@@ -1,3 +1,11 @@
+"""Standalone thermodynamic and ASF helper functions used in the prototype notebook.
+
+Note: This module pre-dates the modular ``src/`` architecture. The functions
+here are retained for compatibility and exploratory use. For production
+simulations prefer the equivalents in ``src/thermo.py`` and ``src/asf.py``,
+which share constants with the rest of the framework.
+"""
+
 # src/utilities.py
 import math
 

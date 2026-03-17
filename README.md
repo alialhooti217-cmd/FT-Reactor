@@ -156,7 +156,7 @@ cd FT-Reactor
 Install dependencies:
 
 ```bash
-pip install pandas scikit-learn joblib matplotlib pyyaml numpy
+pip install -r requirements.txt
 ```
 
 ---

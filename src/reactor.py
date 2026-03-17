@@ -29,6 +29,45 @@ from src.thermo import (
 
 @dataclasses.dataclass
 class ReactorResults:
+    """All outputs from a single FT loop simulation.
+
+    Attributes:
+        fresh_feed_kmol_h: Total fresh-feed molar flow (kmol/h).
+        reactor_inlet_kmol_h: Total molar flow entering the reactor after
+            mixing with recycle (kmol/h).
+        recycle_kmol_h: Total recycle molar flow (kmol/h).
+        purge_kmol_h: Total purge molar flow (kmol/h).
+        purge_fraction: Purge fraction applied in the loop (−).
+        x_co_single_pass: Single-pass CO conversion achieved (−).
+        alpha: ASF chain growth probability (−).
+        target_rate_kgph: Mass flow of C8–C16 products (kg/h).
+        target_fraction: Mass-based C8–C16 selectivity (−).
+        total_hydrocarbon_rate_kgph: Total hydrocarbon product rate (kg/h).
+        specific_energy_kwh_per_kg_target: Combined compressor + cooling energy
+            per kg of target product (kWh/kg).
+        compressor_power_mw: Recycle compressor electrical power (MW).
+        cooling_duty_mw: Reactor cooling duty (MW).
+        heat_of_reaction_kj_per_kmol_co: Effective ΔH_rxn at operating T
+            (kJ/kmol_CO).
+        total_inlet_flow_kmol_h: Same as ``reactor_inlet_kmol_h`` (kmol/h).
+        total_catalyst_volume_m3: Total catalyst volume across all reactors (m³).
+        reactor_volume_m3: Total reactor (bed) volume across all reactors (m³).
+        n_parallel: Number of parallel reactor trains selected.
+        nt_per_reactor: Number of tubes per reactor.
+        tube_length_m: Selected tube length (m).
+        shell_diameter_m: Shell inner diameter (m).
+        l_over_d: Shell length-to-diameter ratio (−).
+        superficial_velocity_m_s: Gas superficial velocity inside tubes (m/s).
+        delta_p_bar: Pressure drop across the packed bed (bar).
+        max_delta_p_bar: Allowable pressure drop limit (bar).
+        gas_density_kg_m3: Inlet gas density (kg/m³).
+        cp_mix_kj_kmolk: Inlet mixture heat capacity (kJ/kmol·K).
+        rco_kmol_m3_s: Volumetric CO reaction rate at inlet (kmol/m³/s).
+        feasible: ``True`` if all design constraints are satisfied.
+        violation_reason: Human-readable string summarising any violations.
+        loop_iterations: Number of recycle-loop iterations until convergence.
+    """
+
     fresh_feed_kmol_h: float
     reactor_inlet_kmol_h: float
     recycle_kmol_h: float
@@ -89,6 +128,26 @@ class ReactorResults:
 
 
 class FTReactor:
+    """Fischer-Tropsch loop reactor model.
+
+    Encapsulates the full simulation workflow:
+
+    1. Recycle-loop convergence (``_run_loop``): iterates fresh-feed +
+       recycle → reactor → separator → recycle until the recycle flow
+       stabilises within ``loop_tolerance``.
+    2. Gas-phase property calculations (density, Cp).
+    3. Catalyst volume estimation (GHSV-based, kinetics-based, or max).
+    4. Reactor geometry search (:func:`~src.geometry.search_geometry`).
+    5. Pressure-drop calculation (Ergun equation).
+    6. Feasibility checking (5+ hard constraints).
+    7. KPI aggregation into a :class:`ReactorResults` dataclass.
+
+    Args:
+        config: Full configuration dict loaded from ``config.yaml``.
+        feed_composition: Optional override for fresh-feed stream (kmol/h).
+            If ``None``, the feed is built from ``config["feed"]``.
+    """
+
     def __init__(self, config: dict, feed_composition: dict | None = None):
         self.config = config
         self.fresh_feed = feed_composition or build_total_feed(config)
@@ -211,6 +270,24 @@ class FTReactor:
         return (len(violations) == 0), ("All constraints satisfied" if not violations else "; ".join(violations))
 
     def _run_loop(self):
+        """Converge the recycle loop by iterating until steady state.
+
+        Starts with an empty recycle stream and repeatedly:
+        - Mixes fresh feed with recycle.
+        - Computes single-pass conversion and ASF products.
+        - Applies stoichiometry and separates gas from liquid.
+        - Splits gas into recycle and purge.
+
+        Convergence is declared when the change in total recycle flow
+        between successive iterations is smaller than ``loop_tolerance``
+        relative to the current recycle flow.
+
+        Returns:
+            Dict containing the converged stream data and loop metadata
+            (``inlet_stream``, ``outlet_stream``, ``recycle_stream``,
+            ``purge_stream``, ``liquid_stream``, ``alpha``, ``x_co``,
+            ``asf_result``, ``stoich``, ``iteration``).
+        """
         recycle_stream = {comp: 0.0 for comp in self.fresh_feed}
         last_total = None
         loop_data = {}
@@ -251,6 +328,15 @@ class FTReactor:
         return loop_data
 
     def run(self) -> ReactorResults:
+        """Execute the full FT loop simulation and return all results.
+
+        Calls ``_run_loop`` to converge the recycle, then performs geometry
+        sizing, pressure-drop calculation, feasibility checking, and KPI
+        aggregation.
+
+        Returns:
+            :class:`ReactorResults` dataclass with all simulation outputs.
+        """
         loop = self._run_loop()
         inlet_stream = loop["inlet_stream"]
         recycle_stream = loop["recycle_stream"]
@@ -348,6 +434,23 @@ class FTReactor:
 
 
 def run_case(config: dict, feed_composition: dict | None = None) -> dict:
+    """Run a single FT simulation and return a flat dict suitable for CSV export.
+
+    Combines :class:`ReactorResults` fields with labelled input-feature columns
+    so that the output can be directly appended to the batch dataset for
+    surrogate-model training.
+
+    Args:
+        config: Full configuration dict.
+        feed_composition: Optional fresh-feed override (kmol/h).
+
+    Returns:
+        Flat dict containing all :class:`ReactorResults` fields plus
+        ``input_*`` columns for each of the 9 surrogate input features.
+
+    Raises:
+        KeyError: If any of the 6 required ML target columns are missing.
+    """
     reactor = FTReactor(config=config, feed_composition=feed_composition)
     results = reactor.run()
     row = results.to_dict()
