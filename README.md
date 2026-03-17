@@ -29,8 +29,9 @@ FT-Reactor/
 ├── requirements.txt                 ← Python dependencies
 ├── config.yaml                      ← central configuration file
 ├── main.py                          ← entry point for single simulations
-├── run_interactive.py               ← interactive CLI for user-defined inputs
+├── run_interactive.py               ← rich terminal UI for user-defined inputs
 ├── visualize.py                     ← generates 2D and 3D plots from the dataset
+├── app.py                           ← Streamlit web dashboard (browser UI)
 ├── Copy_of_FT_Reactor.ipynb         ← standalone prototype sizing notebook
 │
 ├── src/                             ← core simulation modules
@@ -184,17 +185,31 @@ python main.py
 
 All parameters are controlled through `config.yaml` at the project root.
 
-### Interactive Mode
+### Interactive Terminal Mode
 
-For a guided experience where you enter parameters one by one:
+A colorful, formatted terminal UI using the `rich` library:
 
 ```bash
 python run_interactive.py
 ```
 
-The script prompts for each parameter with its valid range and default value.
-Press Enter to accept defaults, or type a value. Results are displayed in a
-formatted summary including geometry, hydraulics, energy, and feasibility.
+Features a parameter table with ranges, KPI bar charts, an ASCII reactor
+diagram, and grouped result panels for feed, geometry, energy, and hydraulics.
+Press Enter to accept defaults, or type a value.
+
+### Web Dashboard (Streamlit)
+
+A browser-based interactive dashboard with sliders and live charts:
+
+```bash
+streamlit run app.py
+```
+
+Opens at `http://localhost:8501`. Features:
+* Sidebar sliders for all 9 operating parameters
+* Live KPI metric cards after each run
+* Tabs for: KPI bar charts, reactor geometry, energy & loop, dataset plots
+* ASCII reactor diagram with current configuration
 
 ---
 
