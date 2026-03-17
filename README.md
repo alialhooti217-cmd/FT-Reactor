@@ -51,6 +51,7 @@ FT-Reactor/
 │
 ├── ml/
 │   ├── surrogate.py                 ← ML model training (ExtraTreesRegressor)
+│   ├── predictor.py                 ← shared surrogate loader and prediction interface
 │   ├── optimize_surrogate.py        ← optimisation via trained surrogate
 │   ├── plots.py                     ← ML-specific plot utilities
 │   ├── test_surrogate.py            ← surrogate smoke test
@@ -193,9 +194,11 @@ A colorful, formatted terminal UI using the `rich` library:
 python run_interactive.py
 ```
 
-Features a parameter table with ranges, KPI bar charts, an ASCII reactor
-diagram, and grouped result panels for feed, geometry, energy, and hydraulics.
-Press Enter to accept defaults, or type a value.
+At startup, choose the simulation mode:
+* **🤖 ML Surrogate (default)** — instant predictions from the trained model, shows R² accuracy scores, optional comparison against full physics
+* **⚗️ Full Physics** — runs all equations, shows geometry, recycle loop, and energy details
+
+Features color-coded KPI bar charts, a parameter range table, feasibility banner, and an ASCII reactor diagram.
 
 ### Web Dashboard (Streamlit)
 
@@ -206,10 +209,11 @@ streamlit run app.py
 ```
 
 Opens at `http://localhost:8501`. Features:
+* Sidebar mode selector: **ML Surrogate** (instant) or **Full Physics**
 * Sidebar sliders for all 9 operating parameters
-* Live KPI metric cards after each run
-* Tabs for: KPI bar charts, reactor geometry, energy & loop, dataset plots
-* ASCII reactor diagram with current configuration
+* Live KPI metric cards and feasibility badge after each run
+* **ML mode tabs:** KPI charts · ML model info (R² scores, training stats) · Compare vs Physics · Dataset plots
+* **Physics mode tabs:** KPI charts · Reactor geometry + ASCII diagram · Energy & recycle loop · Dataset plots
 
 ---
 
