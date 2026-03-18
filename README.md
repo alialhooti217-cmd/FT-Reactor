@@ -32,7 +32,12 @@ FT-Reactor/
 ├── run_interactive.py               ← rich terminal UI for user-defined inputs
 ├── visualize.py                     ← generates 2D and 3D plots from the dataset
 ├── app.py                           ← Streamlit web dashboard (browser UI)
+├── launch_app.sh                    ← portable shell script to launch the dashboard
+├── FT-Reactor.desktop               ← Linux desktop/application menu launcher
 ├── Copy_of_FT_Reactor.ipynb         ← standalone prototype sizing notebook
+│
+├── .vscode/
+│   └── tasks.json                   ← VS Code tasks for one-click launch
 │
 ├── src/                             ← core simulation modules
 │   ├── constants.py                 ← molecular weights, ASF params, thermo data
@@ -161,59 +166,147 @@ Samples large numbers of input combinations and predicts outputs using the surro
 
 # Installation
 
-Clone the repository:
+### Step 1 — Clone the repository
 
 ```bash
 git clone https://github.com/alialhooti217-cmd/FT-Reactor.git
 cd FT-Reactor
 ```
 
-Install dependencies:
+### Step 2 — Create a virtual environment (recommended)
+
+```bash
+# Create the environment
+python -m venv .venv
+
+# Activate it
+# On Linux / macOS:
+source .venv/bin/activate
+
+# On Windows (Command Prompt):
+.venv\Scripts\activate.bat
+
+# On Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+```
+
+> You will see `(.venv)` at the start of your terminal prompt when active.
+> To deactivate at any time, run `deactivate`.
+
+### Step 3 — Install all required packages
 
 ```bash
 pip install -r requirements.txt
+```
+
+This installs all dependencies including `streamlit`, `scikit-learn`, `pandas`,
+`numpy`, `matplotlib`, `scipy`, `pyyaml`, `rich`, and `pytest`.
+
+To verify the installation:
+
+```bash
+python -c "import streamlit, sklearn, pandas, numpy; print('All packages OK')"
+```
+
+### Step 4 — Set up the launcher (optional)
+
+The repository includes ready-made launchers so you can open the dashboard
+from anywhere without navigating to the project folder each time.
+
+**VS Code task (recommended):**
+The `.vscode/tasks.json` file is already included. Open the project folder in
+VS Code and the tasks are available immediately — no extra setup needed.
+
+**System application menu (Linux):**
+Install the `.desktop` file so the dashboard appears in your application menu:
+
+```bash
+# Copy to user applications directory
+cp FT-Reactor.desktop ~/.local/share/applications/
+
+# Make it executable
+chmod +x ~/.local/share/applications/FT-Reactor.desktop
+
+# Refresh the application database (optional, some distros do this automatically)
+update-desktop-database ~/.local/share/applications/
+```
+
+**Shell shortcut — run from any terminal folder:**
+Add an alias to your shell config so you can type `ft-reactor` anywhere:
+
+```bash
+# For bash users — add to ~/.bashrc
+echo "alias ft-reactor='bash /home/user/FT-Reactor/launch_app.sh'" >> ~/.bashrc
+source ~/.bashrc
+
+# For zsh users — add to ~/.zshrc
+echo "alias ft-reactor='bash /home/user/FT-Reactor/launch_app.sh'" >> ~/.zshrc
+source ~/.zshrc
+```
+
+Then launch from anywhere with:
+```bash
+ft-reactor
 ```
 
 ---
 
 # Running the Simulation
 
-Run a single simulation using the base configuration:
+### Quick-start: Web Dashboard (Streamlit) — recommended for presentations
 
+The Streamlit dashboard is the primary interface. It has **sidebar sliders**
+for all 9 parameters, live KPI cards, and ML Surrogate mode for instant results.
+
+**Option A — VS Code (one click, no terminal needed):**
+1. Open the `FT-Reactor` folder in VS Code
+2. Press `Ctrl+Shift+B` — the dashboard launches and opens automatically in your browser
+
+**Option B — Terminal alias (from any folder):**
 ```bash
-python main.py
+ft-reactor
+```
+*(requires the alias setup from the Installation section above)*
+
+**Option C — From inside the project folder:**
+```bash
+streamlit run app.py
 ```
 
-All parameters are controlled through `config.yaml` at the project root.
+All three options open the dashboard at `http://localhost:8501`.
+
+**Dashboard features:**
+* Sidebar mode selector: **ML Surrogate** (instant) or **Full Physics**
+* Sidebar sliders for all 9 operating parameters
+* Live KPI metric cards and feasibility badge after each run
+* **ML mode tabs:** KPI charts · ML model info (R² scores, training stats) · Compare vs Physics · Dataset plots
+* **Physics mode tabs:** KPI charts · Reactor geometry + ASCII diagram · Energy & recycle loop · Dataset plots
+
+---
 
 ### Interactive Terminal Mode
 
-A colorful, formatted terminal UI using the `rich` library:
+A colorful terminal UI using the `rich` library — useful without a browser:
 
 ```bash
 python run_interactive.py
 ```
 
 At startup, choose the simulation mode:
-* **🤖 ML Surrogate (default)** — instant predictions from the trained model, shows R² accuracy scores, optional comparison against full physics
-* **⚗️ Full Physics** — runs all equations, shows geometry, recycle loop, and energy details
+* **ML Surrogate (default)** — instant predictions from the trained model, shows R² accuracy scores, optional comparison against full physics
+* **Full Physics** — runs all equations, shows geometry, recycle loop, and energy details
 
 Features color-coded KPI bar charts, a parameter range table, feasibility banner, and an ASCII reactor diagram.
 
-### Web Dashboard (Streamlit)
+### Single Simulation (no UI)
 
-A browser-based interactive dashboard with sliders and live charts:
+Run one simulation with settings from `config.yaml`:
 
 ```bash
-streamlit run app.py
+python main.py
 ```
 
-Opens at `http://localhost:8501`. Features:
-* Sidebar mode selector: **ML Surrogate** (instant) or **Full Physics**
-* Sidebar sliders for all 9 operating parameters
-* Live KPI metric cards and feasibility badge after each run
-* **ML mode tabs:** KPI charts · ML model info (R² scores, training stats) · Compare vs Physics · Dataset plots
-* **Physics mode tabs:** KPI charts · Reactor geometry + ASCII diagram · Energy & recycle loop · Dataset plots
+All parameters are controlled through `config.yaml` at the project root.
 
 ---
 
