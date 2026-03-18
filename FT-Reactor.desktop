@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FT-Reactor Dashboard
+GenericName=Fischer-Tropsch Reactor Simulator
+Comment=ML-powered Fischer-Tropsch reactor simulation with interactive sliders
+Exec=bash /home/user/FT-Reactor/launch_app.sh
+Icon=applications-science
+Terminal=true
+Categories=Science;Education;Engineering;
+Keywords=FT;Fischer-Tropsch;reactor;simulation;ML;
+StartupNotify=true
