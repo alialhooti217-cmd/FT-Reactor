@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-03-14T19:48:47.874938+00:00",
+  "timestamp": "2026-03-24T11:25:43.326403+00:00",
   "random_seed": 42,
-  "n_cases_requested": 21000,
-  "n_cases_completed": 21000,
-  "n_success": 21000,
+  "n_cases_requested": 25000,
+  "n_cases_completed": 25000,
+  "n_success": 25000,
   "n_failed": 0,
-  "n_feasible": 10527,
+  "n_feasible": 4318,
   "sampling_method": "stratified_random",
   "ranges": {
     "temperature_C": {
@@ -25,8 +25,8 @@
       "max": 0.78
     },
     "total_flow_kmol_h": {
-      "min": 900.0,
-      "max": 1800.0
+      "min": 500.0,
+      "max": 10000.0
     },
     "tube_inner_diameter_m": {
       "min": 0.04,
@@ -47,6 +47,18 @@
     "reactors_max_search": {
       "min": 16,
       "max": 24
+    },
+    "h2_co_ratio": {
+      "min": 1.5,
+      "max": 3.0
+    },
+    "co2_fraction": {
+      "min": 0.0,
+      "max": 0.1
+    },
+    "n2_fraction": {
+      "min": 0.0,
+      "max": 0.15
     }
   },
   "kpis": {
@@ -71,7 +83,7 @@
     "model_dir": "models",
     "plots_dir": "plots"
   },
-  "training_rows": 10527,
+  "training_rows": 4318,
   "feature_columns": [
     "input_temperature_C",
     "input_pressure_bar",
@@ -81,7 +93,10 @@
     "input_tube_inner_diameter_m",
     "input_particle_diameter_m",
     "input_void_fraction",
-    "input_purge_fraction"
+    "input_purge_fraction",
+    "input_h2_co_ratio",
+    "input_co2_fraction",
+    "input_n2_fraction"
   ],
   "target_columns": [
     "target_rate_kgph",
@@ -95,38 +110,38 @@
     "feasible_numeric"
   ],
   "model_type": "MultiOutputRegressor(ExtraTreesRegressor)",
-  "n_training_rows": 10527,
-  "n_train_rows_split": 8421,
-  "n_validation_rows_split": 2106,
+  "n_training_rows": 4318,
+  "n_train_rows_split": 3454,
+  "n_validation_rows_split": 864,
   "metrics": {
     "target_rate_kgph": {
-      "mae": 2.322522863107846,
-      "r2": 0.9998284479130539
+      "mae": 34.082289565993584,
+      "r2": 0.9948227676776488
     },
     "target_fraction": {
-      "mae": 2.4265589603218755e-05,
-      "r2": 0.9999179125695834
+      "mae": 0.00014077147516855488,
+      "r2": 0.9965440883510523
     },
     "specific_energy_kwh_per_kg_target": {
-      "mae": 0.005201673499287403,
-      "r2": 0.9993207580226637
+      "mae": 0.20723924394207027,
+      "r2": 0.9726467269345613
     },
     "compressor_power_mw": {
-      "mae": 0.00491832240411721,
-      "r2": 0.9993475931719148
+      "mae": 0.11747462042492447,
+      "r2": 0.9828130673200071
     },
     "cooling_duty_mw": {
-      "mae": 0.024882530413755995,
-      "r2": 0.9999101711917361
+      "mae": 0.6744600839558117,
+      "r2": 0.9972995474575901
     },
     "delta_p_bar": {
-      "mae": 0.11796115606772505,
-      "r2": 0.9699755804599889
+      "mae": 0.338397402935421,
+      "r2": 0.803622256026847
     }
   },
   "artifacts": {
-    "model_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_model.joblib",
-    "metadata_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_metadata.json",
-    "training_data_path": "C:\\Users\\Ali Maqdad Alhooti\\Downloads\\ft_edit\\models\\surrogate_training_data.csv"
+    "model_path": "/home/user/FT-Reactor/models/surrogate_model.joblib",
+    "metadata_path": "/home/user/FT-Reactor/models/surrogate_metadata.json",
+    "training_data_path": "/home/user/FT-Reactor/models/surrogate_training_data.csv"
   }
 }

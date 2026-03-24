@@ -6,3 +6,7 @@ __pycache__/
 dist/
 build/
 .env
+
+# Large ML model files (regenerate with: python batch/run_batch.py)
+models/surrogate_model.joblib
+models/surrogate_training_data.csv
