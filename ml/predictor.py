@@ -27,6 +27,9 @@ FEATURE_MAP = {
     "particle_diameter_m":   "input_particle_diameter_m",
     "void_fraction":         "input_void_fraction",
     "purge_fraction":        "input_purge_fraction",
+    "h2_co_ratio":           "input_h2_co_ratio",
+    "co2_fraction":          "input_co2_fraction",
+    "n2_fraction":           "input_n2_fraction",
 }
 
 TARGET_COLUMNS = [

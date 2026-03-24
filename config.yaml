@@ -125,7 +125,7 @@ kpi_definitions:
 dataset_generation:
   sampling_method: stratified_random
   random_seed: 42
-  n_cases: 12000
+  n_cases: 25000
   tube_wall_thickness_m: 0.0032
   output_dataset_csv: data/processed/dataset.csv
   output_feasible_dataset_csv: data/processed/dataset_feasible.csv
@@ -150,8 +150,8 @@ dataset_generation:
       max: 0.78
 
     total_flow_kmol_h:
-      min: 900.0
-      max: 1800.0
+      min: 500.0
+      max: 10000.0
 
     tube_inner_diameter_m:
       min: 0.0400
@@ -172,3 +172,15 @@ dataset_generation:
     reactors_max_search:
       min: 16
       max: 24
+
+    h2_co_ratio:
+      min: 1.5
+      max: 3.0
+
+    co2_fraction:
+      min: 0.0
+      max: 0.10
+
+    n2_fraction:
+      min: 0.0
+      max: 0.15

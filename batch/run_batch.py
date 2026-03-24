@@ -157,8 +157,40 @@ def sample_cases(base_config: dict) -> list[dict]:
             elif key == "reactors_max_search":
                 cfg["design_basis"]["reactors_max_search"] = int(round(val))
 
+            elif key == "h2_co_ratio":
+                cfg.setdefault("_sampled_composition", {})["h2_co_ratio"] = float(val)
+
+            elif key == "co2_fraction":
+                cfg.setdefault("_sampled_composition", {})["co2_fraction"] = float(val)
+
+            elif key == "n2_fraction":
+                cfg.setdefault("_sampled_composition", {})["n2_fraction"] = float(val)
+
             else:
                 raise KeyError(f"Unsupported range key: {key}")
+
+        # Apply sampled composition: derive H2 and CO from ratio and inerts
+        sampled = cfg.pop("_sampled_composition", {})
+        if sampled:
+            ratio = sampled.get("h2_co_ratio", 2.2)
+            co2_f = sampled.get("co2_fraction", 0.02)
+            n2_f = sampled.get("n2_fraction", 0.02)
+            remaining = max(1.0 - co2_f - n2_f, 0.01)
+            h2_f = remaining * ratio / (ratio + 1.0)
+            co_f = remaining / (ratio + 1.0)
+            comp = cfg["feed"]["composition"]
+            comp["H2"] = h2_f
+            comp["CO"] = co_f
+            comp["CO2"] = co2_f
+            comp["N2"] = n2_f
+            # Zero out other species and renormalize
+            for sp in comp:
+                if sp not in ("H2", "CO", "CO2", "N2"):
+                    comp[sp] = 0.0
+            total = sum(comp.values())
+            if total > 0:
+                for sp in comp:
+                    comp[sp] /= total
 
         cases.append(cfg)
 

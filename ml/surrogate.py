@@ -26,6 +26,9 @@ FEATURE_COLUMNS = [
     "input_particle_diameter_m",
     "input_void_fraction",
     "input_purge_fraction",
+    "input_h2_co_ratio",
+    "input_co2_fraction",
+    "input_n2_fraction",
 ]
 
 TARGET_COLUMNS = [

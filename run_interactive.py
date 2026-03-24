@@ -56,7 +56,10 @@ PARAMETERS = [
     ("Pressure",             "operating_conditions.pressure_bar",        25.0,  20.0,  28.0, "bar"),
     ("GHSV",                 "design_basis.ghsv_h",                   1800.0, 1500.0, 2200.0, "h⁻¹"),
     ("Target CO Conversion", "target_x_co",                             0.72,  0.60,  0.78, ""),
-    ("Total Feed Flow",      "feed.total_flow_kmol_h",                1200.0,  900.0, 1800.0, "kmol/h"),
+    ("Total Feed Flow",      "feed.total_flow_kmol_h",                1200.0,  500.0, 10000.0, "kmol/h"),
+    ("H₂/CO Ratio",         "_composition.h2_co_ratio",                2.2,   1.5,   3.0, ""),
+    ("CO₂ Fraction",        "_composition.co2_fraction",               0.02,  0.0,   0.10, ""),
+    ("N₂ / Inerts Fraction","_composition.n2_fraction",                0.02,  0.0,   0.15, ""),
     ("Tube Inner Diameter",  "reactor_geometry.tube_inner_diameter_m",  0.042, 0.040, 0.046, "m"),
     ("Particle Diameter",    "bed_properties.particle_diameter_m",     0.0012, 0.0011, 0.0015, "m"),
     ("Void Fraction",        "bed_properties.void_fraction",            0.42,  0.41,  0.46, ""),
@@ -284,6 +287,7 @@ def prompt_parameters(base_config: dict, use_ml: bool) -> tuple[dict, dict]:
     console.print("[muted]  Press Enter to accept the default. Type 'q' to quit.[/muted]\n")
 
     config = copy.deepcopy(base_config)
+    composition_params = {}
 
     for label, dotpath, default, lo, hi, unit in PARAMETERS:
         unit_str = f" {unit}" if unit else ""
@@ -303,10 +307,34 @@ def prompt_parameters(base_config: dict, use_ml: bool) -> tuple[dict, dict]:
                 val = max(lo, min(hi, val))
             break
 
-        set_nested(config, dotpath, val)
+        if dotpath.startswith("_composition."):
+            comp_key = dotpath.split(".", 1)[1]
+            composition_params[comp_key] = val
+        else:
+            set_nested(config, dotpath, val)
         flat_params[dotpath] = val
         if dotpath == "reactor_geometry.tube_inner_diameter_m":
             set_nested(config, "reactor_geometry.tube_outer_diameter_m", val + 0.0032)
+
+    # Apply composition to feed
+    ratio = composition_params.get("h2_co_ratio", 2.2)
+    co2_f = composition_params.get("co2_fraction", 0.02)
+    n2_f = composition_params.get("n2_fraction", 0.02)
+    remaining = max(1.0 - co2_f - n2_f, 0.01)
+    h2_f = remaining * ratio / (ratio + 1.0)
+    co_f = remaining / (ratio + 1.0)
+    comp = config["feed"]["composition"]
+    comp["H2"] = h2_f
+    comp["CO"] = co_f
+    comp["CO2"] = co2_f
+    comp["N2"] = n2_f
+    for sp in comp:
+        if sp not in ("H2", "CO", "CO2", "N2"):
+            comp[sp] = 0.0
+    total_comp = sum(comp.values())
+    if total_comp > 0:
+        for sp in comp:
+            comp[sp] /= total_comp
 
     return config, flat_params
 
@@ -341,6 +369,7 @@ def main() -> None:
         try:
             if mode == "ml":
                 # Build the short-key dict from the config
+                comp = config["feed"]["composition"]
                 ml_params = {
                     "temperature_C":         config["operating_conditions"]["temperature_C"],
                     "pressure_bar":          config["operating_conditions"]["pressure_bar"],
@@ -351,6 +380,9 @@ def main() -> None:
                     "particle_diameter_m":   config["bed_properties"]["particle_diameter_m"],
                     "void_fraction":         config["bed_properties"]["void_fraction"],
                     "purge_fraction":        config["loop_configuration"]["purge_fraction"],
+                    "h2_co_ratio":           comp.get("H2", 0.66) / max(comp.get("CO", 0.30), 1e-12),
+                    "co2_fraction":          comp.get("CO2", 0.02),
+                    "n2_fraction":           comp.get("N2", 0.02),
                 }
                 console.print("[muted]  Predicting with ML model...[/muted]")
                 result = ml_predict(ml_params, model=ml_model)

@@ -467,6 +467,14 @@ def run_case(config: dict, feed_composition: dict | None = None) -> dict:
     row["input_reactors_max_search"] = config["design_basis"]["reactors_max_search"]
     row["input_purge_fraction"] = config.get("loop_configuration", {}).get("purge_fraction", 0.05)
 
+    # Composition features for extended surrogate model
+    comp = config.get("feed", {}).get("composition", {})
+    co_frac = comp.get("CO", 0.0)
+    h2_frac = comp.get("H2", 0.0)
+    row["input_h2_co_ratio"] = h2_frac / max(co_frac, 1e-12)
+    row["input_co2_fraction"] = comp.get("CO2", 0.0)
+    row["input_n2_fraction"] = comp.get("N2", 0.0)
+
     # Optional consistency check for ML target columns
     required_targets = [
         "target_rate_kgph",
