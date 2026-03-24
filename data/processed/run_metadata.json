@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-03-24T11:25:43.326403+00:00",
+  "timestamp": "2026-03-24T12:41:10.456752+00:00",
   "random_seed": 42,
-  "n_cases_requested": 25000,
-  "n_cases_completed": 25000,
-  "n_success": 25000,
+  "n_cases_requested": 30000,
+  "n_cases_completed": 30000,
+  "n_success": 30000,
   "n_failed": 0,
-  "n_feasible": 4318,
+  "n_feasible": 21012,
   "sampling_method": "stratified_random",
   "ranges": {
     "temperature_C": {
@@ -25,8 +25,8 @@
       "max": 0.78
     },
     "total_flow_kmol_h": {
-      "min": 500.0,
-      "max": 10000.0
+      "min": 800.0,
+      "max": 5000.0
     },
     "tube_inner_diameter_m": {
       "min": 0.04,
@@ -49,8 +49,8 @@
       "max": 24
     },
     "h2_co_ratio": {
-      "min": 1.5,
-      "max": 3.0
+      "min": 2.05,
+      "max": 2.5
     },
     "co2_fraction": {
       "min": 0.0,
@@ -83,5 +83,5 @@
     "model_dir": "models",
     "plots_dir": "plots"
   },
-  "training_rows": 4318
+  "training_rows": 21012
 }

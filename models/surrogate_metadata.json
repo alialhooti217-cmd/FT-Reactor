@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-03-24T11:25:43.326403+00:00",
+  "timestamp": "2026-03-24T12:41:10.456752+00:00",
   "random_seed": 42,
-  "n_cases_requested": 25000,
-  "n_cases_completed": 25000,
-  "n_success": 25000,
+  "n_cases_requested": 30000,
+  "n_cases_completed": 30000,
+  "n_success": 30000,
   "n_failed": 0,
-  "n_feasible": 4318,
+  "n_feasible": 21012,
   "sampling_method": "stratified_random",
   "ranges": {
     "temperature_C": {
@@ -25,8 +25,8 @@
       "max": 0.78
     },
     "total_flow_kmol_h": {
-      "min": 500.0,
-      "max": 10000.0
+      "min": 800.0,
+      "max": 5000.0
     },
     "tube_inner_diameter_m": {
       "min": 0.04,
@@ -49,8 +49,8 @@
       "max": 24
     },
     "h2_co_ratio": {
-      "min": 1.5,
-      "max": 3.0
+      "min": 2.05,
+      "max": 2.5
     },
     "co2_fraction": {
       "min": 0.0,
@@ -83,7 +83,7 @@
     "model_dir": "models",
     "plots_dir": "plots"
   },
-  "training_rows": 4318,
+  "training_rows": 21012,
   "feature_columns": [
     "input_temperature_C",
     "input_pressure_bar",
@@ -110,33 +110,33 @@
     "feasible_numeric"
   ],
   "model_type": "MultiOutputRegressor(ExtraTreesRegressor)",
-  "n_training_rows": 4318,
-  "n_train_rows_split": 3454,
-  "n_validation_rows_split": 864,
+  "n_training_rows": 21012,
+  "n_train_rows_split": 16809,
+  "n_validation_rows_split": 4203,
   "metrics": {
     "target_rate_kgph": {
-      "mae": 34.082289565993584,
-      "r2": 0.9948227676776488
+      "mae": 15.661437395783386,
+      "r2": 0.9981102386237451
     },
     "target_fraction": {
-      "mae": 0.00014077147516855488,
-      "r2": 0.9965440883510523
+      "mae": 6.173797226550545e-05,
+      "r2": 0.9996995777649749
     },
     "specific_energy_kwh_per_kg_target": {
-      "mae": 0.20723924394207027,
-      "r2": 0.9726467269345613
+      "mae": 0.11649322471003862,
+      "r2": 0.9903773354100595
     },
     "compressor_power_mw": {
-      "mae": 0.11747462042492447,
-      "r2": 0.9828130673200071
+      "mae": 0.0572779387205795,
+      "r2": 0.9941388294906829
     },
     "cooling_duty_mw": {
-      "mae": 0.6744600839558117,
-      "r2": 0.9972995474575901
+      "mae": 0.27552843871266486,
+      "r2": 0.999328947901337
     },
     "delta_p_bar": {
-      "mae": 0.338397402935421,
-      "r2": 0.803622256026847
+      "mae": 0.21315127978017143,
+      "r2": 0.9092922674587692
     }
   },
   "artifacts": {
