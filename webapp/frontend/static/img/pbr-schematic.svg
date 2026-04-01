@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+  <rect width="1200" height="420" fill="#f8fbff"/>
+  <rect x="170" y="80" width="860" height="260" rx="22" fill="#d7ebff" stroke="#0f4c81" stroke-width="4"/>
+  <rect x="220" y="120" width="760" height="180" rx="12" fill="#ffffff" stroke="#1d6aa5" stroke-width="3"/>
+  <g fill="#5da9e9">
+    <rect x="270" y="145" width="640" height="16" rx="8"/>
+    <rect x="270" y="185" width="640" height="16" rx="8"/>
+    <rect x="270" y="225" width="640" height="16" rx="8"/>
+    <rect x="270" y="265" width="640" height="16" rx="8"/>
+  </g>
+  <text x="600" y="50" text-anchor="middle" font-family="Arial" font-size="28" fill="#0f4c81">Packed-Bed Reactor Schematic (Multitubular FT)</text>
+  <path d="M60 210 H170" stroke="#0f4c81" stroke-width="8" fill="none"/>
+  <polygon points="170,210 145,195 145,225" fill="#0f4c81"/>
+  <text x="65" y="185" font-family="Arial" font-size="22" fill="#0f4c81">Syngas Feed</text>
+  <path d="M1030 210 H1140" stroke="#0f4c81" stroke-width="8" fill="none"/>
+  <polygon points="1140,210 1115,195 1115,225" fill="#0f4c81"/>
+  <text x="1000" y="185" font-family="Arial" font-size="22" fill="#0f4c81">FT Products</text>
+</svg>

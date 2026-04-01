@@ -20,3 +20,6 @@ pyyaml>=6.0
 
 # Testing
 pytest>=7.0
+
+# Backend web server
+flask>=3.0
