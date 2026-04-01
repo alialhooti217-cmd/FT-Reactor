@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IR4 Fischer–Tropsch Reactor Studio</title>
+  <link rel="stylesheet" href="{{ url_for('web.static', filename='css/styles.css') }}" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <p class="badge">IR4 Engineering Project</p>
+      <h1>Fischer–Tropsch Packed-Bed Reactor Modeling Studio</h1>
+      <p class="subtitle">Production-ready web interface for full-physics FT reactor simulation, feasibility checks, and engineering KPI review.</p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2>Reactor Input Console</h2>
+      <p>Configure operating conditions, geometry, and loop controls.</p>
+      <form id="sim-form">
+        <div class="grid">
+          <label>Temperature (°C)<input type="number" step="0.1" min="210" max="235" name="temperature_C" value="220" required></label>
+          <label>Pressure (bar)<input type="number" step="0.1" min="20" max="28" name="pressure_bar" value="25" required></label>
+          <label>GHSV (h⁻¹)<input type="number" step="10" min="1500" max="2200" name="ghsv_h" value="1800" required></label>
+          <label>Target CO Conversion<input type="number" step="0.01" min="0.6" max="0.78" name="target_x_co" value="0.72" required></label>
+          <label>Total Feed (kmol/h)<input type="number" step="10" min="900" max="1800" name="total_flow_kmol_h" value="1200" required></label>
+          <label>Tube Inner Diameter (m)<input type="number" step="0.0001" min="0.04" max="0.046" name="tube_inner_diameter_m" value="0.042" required></label>
+          <label>Particle Diameter (m)<input type="number" step="0.00001" min="0.0011" max="0.0015" name="particle_diameter_m" value="0.0012" required></label>
+          <label>Void Fraction<input type="number" step="0.001" min="0.41" max="0.46" name="void_fraction" value="0.42" required></label>
+          <label>Purge Fraction<input type="number" step="0.001" min="0.02" max="0.06" name="purge_fraction" value="0.03" required></label>
+        </div>
+        <button id="run-btn" type="submit">Run Full Physics Simulation</button>
+      </form>
+      <div id="status" class="status">Ready.</div>
+    </section>
+
+    <section class="panel visual-panel">
+      <h2>PBR Visual Section</h2>
+      <div class="reactor-schematic">
+        <div class="tube"></div><div class="tube"></div><div class="tube"></div><div class="tube"></div>
+        <div class="flow">Syngas Inlet → Packed Bed Zone → Product Outlet</div>
+      </div>
+      <img src="{{ url_for('web.static', filename='img/pbr-schematic.svg') }}" alt="Packed bed reactor schematic"/>
+    </section>
+
+    <section class="panel results-panel">
+      <h2>Simulation Output Dashboard</h2>
+      <div id="results" class="cards"></div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('web.static', filename='js/app.js') }}"></script>
+</body>
+</html>
