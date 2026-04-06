@@ -32,6 +32,9 @@ FT-Reactor/
 ├── run_interactive.py               ← rich terminal UI for user-defined inputs
 ├── visualize.py                     ← generates 2D and 3D plots from the dataset
 ├── app.py                           ← Streamlit web dashboard (browser UI)
+├── web_app.py                       ← Flask + HTML standalone web interface
+├── templates/
+│   └── index.html                   ← interactive HTML frontend (SQU branded)
 ├── launch_app.sh                    ← portable shell script to launch the dashboard
 ├── FT-Reactor.desktop               ← Linux desktop/application menu launcher
 ├── Copy_of_FT_Reactor.ipynb         ← standalone prototype sizing notebook
@@ -281,6 +284,34 @@ All three options open the dashboard at `http://localhost:8501`.
 * Live KPI metric cards and feasibility badge after each run
 * **ML mode tabs:** KPI charts · ML model info (R² scores, training stats) · Compare vs Physics · Dataset plots
 * **Physics mode tabs:** KPI charts · Reactor geometry + ASCII diagram · Energy & recycle loop · Dataset plots
+
+---
+
+### HTML Web Interface (Flask)
+
+A standalone, lightweight HTML interface branded for **Sultan Qaboos University —
+College of Engineering, Department of Chemical and Process Engineering**. It loads the
+same trained ML surrogate but presents it through a custom HTML/CSS/JS frontend
+with an inline SVG of the complete FT loop (packed-bed reactor, separator,
+recycle compressor, purge, cooling water).
+
+```bash
+python web_app.py
+```
+
+Then open `http://localhost:5000` in your browser.
+
+**Features:**
+* **SQU header** with university name, college, and department
+* **Interactive PBR / FT loop diagram** rendered as inline SVG, with live overlays
+  showing temperature, pressure, ΔP, cooling duty, compressor power
+* **9 sliders** (operating conditions + reactor geometry) with bidirectional number inputs
+* **Auto-predict** on slider change (350 ms debounce) — instant feedback
+* **6 color-coded KPI cards** with feasibility badge (green/red)
+* **Model info panel** showing R² scores and training statistics
+* **Responsive dark theme** that works on desktop and mobile
+* Backend exposes `/api/predict` and `/api/metadata` REST endpoints (reuses
+  `ml.predictor.predict()` so results match the Streamlit app exactly)
 
 ---
 
