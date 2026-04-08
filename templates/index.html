@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FT Reactor ML Simulator | SQU</title>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --panel: #1e2433;
+  --panel-2: #161b29;
+  --border: #2e3757;
+  --text: #e8eaf6;
+  --text-dim: #8b95b0;
+  --accent: #74b9ff;
+  --green: #52b788;
+  --green-bg: #1b4332;
+  --red: #e63946;
+  --red-bg: #3b0a0a;
+  --c1: #4dabf7;
+  --c2: #69db7c;
+  --c3: #ffa94d;
+  --c4: #cc5de8;
+  --c5: #f783ac;
+  --c6: #ff6b6b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: linear-gradient(135deg, #0f1d3a 0%, #1a2a4a 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 24px 32px;
+  text-align: center;
+}
+.squ-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.dept {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.project-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 8px;
+}
+.project-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+
+.section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Process diagram */
+.diagram-wrap {
+  display: flex;
+  justify-content: center;
+  background: var(--panel-2);
+  border-radius: 10px;
+  padding: 16px;
+  overflow-x: auto;
+}
+svg.process-diagram {
+  width: 100%;
+  max-width: 1100px;
+  height: auto;
+}
+
+/* Sliders grid */
+.slider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+.slider-group h3 {
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.slider-row {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.slider-label .name { color: var(--text); font-weight: 600; }
+.slider-label input[type="number"] {
+  width: 90px;
+  padding: 4px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 12px;
+  text-align: right;
+}
+input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 4px rgba(116,185,255,0.5);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg);
+}
+
+/* Predict button */
+.predict-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent), #4a90e2);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.predict-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(116,185,255,0.3);
+}
+
+/* KPI cards */
+.feasibility-bar {
+  margin-bottom: 16px;
+  text-align: center;
+}
+.badge {
+  display: inline-block;
+  padding: 8px 22px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.badge.feasible { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+.badge.infeasible { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.kpi-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+}
+.kpi-card.c1::before { background: var(--c1); }
+.kpi-card.c2::before { background: var(--c2); }
+.kpi-card.c3::before { background: var(--c3); }
+.kpi-card.c4::before { background: var(--c4); }
+.kpi-card.c5::before { background: var(--c5); }
+.kpi-card.c6::before { background: var(--c6); }
+.kpi-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-value { font-size: 26px; font-weight: 800; color: var(--text); }
+.kpi-unit { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* Model info */
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.metrics-table th, .metrics-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.metrics-table th { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 11px; }
+.metrics-table tr:hover td { background: var(--panel-2); }
+.r2-bar {
+  display: inline-block;
+  height: 8px;
+  background: var(--green);
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-dim);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .squ-name { font-size: 22px; }
+  .project-title { font-size: 18px; }
+  main { padding: 16px 12px; }
+  .section { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="squ-name">SULTAN QABOOS UNIVERSITY</div>
+  <div class="dept">College of Engineering &middot; Department of Chemical and Process Engineering</div>
+  <div class="project-title">Fischer&ndash;Tropsch Reactor ML Simulator</div>
+  <div class="project-sub">Interactive surrogate model trained on 21,000 reactor simulations &middot; ExtraTreesRegressor</div>
+</header>
+
+<main>
+
+  <!-- Process Diagram Section -->
+  <div class="section">
+    <div class="section-title">Fischer&ndash;Tropsch Loop &mdash; Packed Bed Reactor Process Flow</div>
+    <div class="diagram-wrap">
+      <svg class="process-diagram" viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#74b9ff"/>
+          </marker>
+          <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#ffa94d"/>
+          </marker>
+          <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b95b0"/>
+          </marker>
+          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#52b788"/>
+          </marker>
+          <linearGradient id="reactorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2a3556"/>
+            <stop offset="100%" stop-color="#1a2238"/>
+          </linearGradient>
+          <linearGradient id="bedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#5a4a3a"/>
+            <stop offset="100%" stop-color="#3a2e22"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Title labels -->
+        <text x="550" y="20" text-anchor="middle" fill="#74b9ff" font-size="13" font-weight="700">FT MULTITUBULAR PACKED-BED REACTOR LOOP</text>
+
+        <!-- Syngas Feed -->
+        <text x="50" y="100" fill="#4dabf7" font-size="12" font-weight="700">SYNGAS FEED</text>
+        <text x="50" y="115" fill="#8b95b0" font-size="10">H₂ + CO</text>
+        <line x1="50" y1="130" x2="180" y2="130" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
+
+        <!-- Mixer -->
+        <circle cx="200" cy="130" r="20" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
+        <text x="200" y="135" text-anchor="middle" fill="#74b9ff" font-size="14" font-weight="700">M</text>
+        <text x="200" y="170" text-anchor="middle" fill="#8b95b0" font-size="10">Mixer</text>
+
+        <!-- Mixer to reactor inlet (bottom) -->
+        <line x1="220" y1="130" x2="280" y2="130" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="280" y1="130" x2="280" y2="380" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="280" y1="380" x2="380" y2="380" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
+        <text x="295" y="250" fill="#8b95b0" font-size="10">Reactor inlet</text>
+
+        <!-- REACTOR VESSEL -->
+        <rect x="400" y="80" width="200" height="320" rx="12" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2.5"/>
+        <text x="500" y="70" text-anchor="middle" fill="#74b9ff" font-size="12" font-weight="700">PACKED BED REACTOR</text>
+
+        <!-- Cooling water jacket (outer rectangle) -->
+        <rect x="392" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
+        <rect x="600" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
+
+        <!-- Tube bundle (vertical lines representing tubes) -->
+        <g stroke="#5a4a3a" stroke-width="6" stroke-linecap="round">
+          <line x1="420" y1="110" x2="420" y2="370"/>
+          <line x1="440" y1="110" x2="440" y2="370"/>
+          <line x1="460" y1="110" x2="460" y2="370"/>
+          <line x1="480" y1="110" x2="480" y2="370"/>
+          <line x1="500" y1="110" x2="500" y2="370"/>
+          <line x1="520" y1="110" x2="520" y2="370"/>
+          <line x1="540" y1="110" x2="540" y2="370"/>
+          <line x1="560" y1="110" x2="560" y2="370"/>
+          <line x1="580" y1="110" x2="580" y2="370"/>
+        </g>
+        <!-- Catalyst pellets pattern overlay -->
+        <g fill="#ffa94d" opacity="0.6">
+          <circle cx="420" cy="150" r="2"/><circle cx="440" cy="160" r="2"/><circle cx="460" cy="155" r="2"/>
+          <circle cx="480" cy="170" r="2"/><circle cx="500" cy="150" r="2"/><circle cx="520" cy="165" r="2"/>
+          <circle cx="540" cy="160" r="2"/><circle cx="560" cy="155" r="2"/><circle cx="580" cy="170" r="2"/>
+          <circle cx="420" cy="220" r="2"/><circle cx="440" cy="210" r="2"/><circle cx="460" cy="225" r="2"/>
+          <circle cx="480" cy="215" r="2"/><circle cx="500" cy="220" r="2"/><circle cx="520" cy="210" r="2"/>
+          <circle cx="540" cy="225" r="2"/><circle cx="560" cy="215" r="2"/><circle cx="580" cy="220" r="2"/>
+          <circle cx="420" cy="290" r="2"/><circle cx="440" cy="300" r="2"/><circle cx="460" cy="285" r="2"/>
+          <circle cx="480" cy="295" r="2"/><circle cx="500" cy="290" r="2"/><circle cx="520" cy="300" r="2"/>
+          <circle cx="540" cy="285" r="2"/><circle cx="560" cy="295" r="2"/><circle cx="580" cy="290" r="2"/>
+        </g>
+
+        <text x="500" y="240" text-anchor="middle" fill="#e8eaf6" font-size="11" font-weight="700">Co Catalyst</text>
+        <text x="500" y="255" text-anchor="middle" fill="#8b95b0" font-size="10">Tube Bundle</text>
+
+        <!-- Cooling water in/out -->
+        <line x1="340" y1="110" x2="392" y2="110" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
+        <text x="340" y="100" text-anchor="end" fill="#52b788" font-size="10" font-weight="700">CW in</text>
+        <line x1="608" y1="370" x2="660" y2="370" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
+        <text x="665" y="375" fill="#52b788" font-size="10" font-weight="700">CW out</text>
+
+        <!-- Reactor outlet (top) -->
+        <line x1="500" y1="80" x2="500" y2="50" stroke="#ffa94d" stroke-width="3"/>
+        <line x1="500" y1="50" x2="780" y2="50" stroke="#ffa94d" stroke-width="3"/>
+        <line x1="780" y1="50" x2="780" y2="170" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
+        <text x="640" y="42" fill="#ffa94d" font-size="10">Reactor outlet (HC + unreacted syngas)</text>
+
+        <!-- SEPARATOR -->
+        <ellipse cx="820" cy="220" rx="60" ry="50" fill="#1e2433" stroke="#74b9ff" stroke-width="2.5"/>
+        <line x1="760" y1="220" x2="880" y2="220" stroke="#74b9ff" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="820" y="200" text-anchor="middle" fill="#74b9ff" font-size="11" font-weight="700">SEPARATOR</text>
+        <text x="820" y="245" text-anchor="middle" fill="#8b95b0" font-size="9">Gas / Liquid</text>
+
+        <!-- Liquid product out (bottom of separator) -->
+        <line x1="820" y1="270" x2="820" y2="380" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
+        <text x="830" y="395" fill="#ffa94d" font-size="11" font-weight="700">C₈–C₁₆ PRODUCT</text>
+        <text x="830" y="408" fill="#8b95b0" font-size="9">Diesel range</text>
+
+        <!-- Gas top of separator -> Compressor -->
+        <line x1="820" y1="170" x2="820" y2="130" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="820" y1="130" x2="980" y2="130" stroke="#4dabf7" stroke-width="3"/>
+
+        <!-- Compressor -->
+        <polygon points="980,115 1010,100 1010,160 980,145" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
+        <text x="995" y="180" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="700">COMP</text>
+
+        <!-- Recycle path back to mixer (top route) -->
+        <line x1="1010" y1="130" x2="1050" y2="130" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="1050" y1="130" x2="1050" y2="40" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="1050" y1="40" x2="200" y2="40" stroke="#4dabf7" stroke-width="3"/>
+        <line x1="200" y1="40" x2="200" y2="110" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
+        <text x="600" y="32" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">RECYCLE LOOP</text>
+
+        <!-- Purge -->
+        <line x1="1030" y1="130" x2="1030" y2="220" stroke="#8b95b0" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+        <text x="1040" y="225" fill="#8b95b0" font-size="10" font-weight="700">PURGE</text>
+        <text x="1040" y="237" fill="#8b95b0" font-size="9">(inerts)</text>
+
+        <!-- Live KPI annotations on diagram -->
+        <g id="kpiAnnotations">
+          <text id="kpi-temp" x="500" y="100" text-anchor="middle" fill="#ffa94d" font-size="10" font-weight="700">T = -- °C</text>
+          <text id="kpi-pres" x="500" y="385" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">P = -- bar</text>
+          <text id="kpi-dp" x="660" y="320" fill="#ff6b6b" font-size="10" font-weight="700">ΔP = -- bar</text>
+          <text id="kpi-cool" x="660" y="335" fill="#52b788" font-size="10" font-weight="700">Q_cool = -- MW</text>
+          <text id="kpi-comp" x="930" y="100" fill="#cc5de8" font-size="10" font-weight="700">W_comp = -- MW</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Input Parameters Section -->
+  <div class="section">
+    <div class="section-title">Input Parameters &mdash; Adjust to Predict</div>
+    <div class="slider-grid">
+      <div class="slider-group">
+        <h3>Operating Conditions</h3>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Temperature (°C)</span>
+            <input type="number" id="num_temperature_C" min="210" max="235" step="0.5" value="220">
+          </div>
+          <input type="range" id="rng_temperature_C" min="210" max="235" step="0.5" value="220">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Pressure (bar)</span>
+            <input type="number" id="num_pressure_bar" min="20" max="28" step="0.5" value="25">
+          </div>
+          <input type="range" id="rng_pressure_bar" min="20" max="28" step="0.5" value="25">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">GHSV (h⁻¹)</span>
+            <input type="number" id="num_ghsv_h" min="1500" max="2200" step="50" value="1800">
+          </div>
+          <input type="range" id="rng_ghsv_h" min="1500" max="2200" step="50" value="1800">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Target CO Conversion</span>
+            <input type="number" id="num_target_x_co" min="0.60" max="0.78" step="0.01" value="0.72">
+          </div>
+          <input type="range" id="rng_target_x_co" min="0.60" max="0.78" step="0.01" value="0.72">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Total Feed Flow (kmol/h)</span>
+            <input type="number" id="num_total_flow_kmol_h" min="900" max="1800" step="50" value="1200">
+          </div>
+          <input type="range" id="rng_total_flow_kmol_h" min="900" max="1800" step="50" value="1200">
+        </div>
+      </div>
+
+      <div class="slider-group">
+        <h3>Reactor Geometry &amp; Bed</h3>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Tube Inner Diameter (m)</span>
+            <input type="number" id="num_tube_inner_diameter_m" min="0.040" max="0.046" step="0.0005" value="0.042">
+          </div>
+          <input type="range" id="rng_tube_inner_diameter_m" min="0.040" max="0.046" step="0.0005" value="0.042">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Particle Diameter (m)</span>
+            <input type="number" id="num_particle_diameter_m" min="0.0011" max="0.0015" step="0.00005" value="0.0012">
+          </div>
+          <input type="range" id="rng_particle_diameter_m" min="0.0011" max="0.0015" step="0.00005" value="0.0012">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Void Fraction</span>
+            <input type="number" id="num_void_fraction" min="0.41" max="0.46" step="0.005" value="0.42">
+          </div>
+          <input type="range" id="rng_void_fraction" min="0.41" max="0.46" step="0.005" value="0.42">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label">
+            <span class="name">Purge Fraction</span>
+            <input type="number" id="num_purge_fraction" min="0.02" max="0.06" step="0.002" value="0.03">
+          </div>
+          <input type="range" id="rng_purge_fraction" min="0.02" max="0.06" step="0.002" value="0.03">
+        </div>
+      </div>
+    </div>
+    <button class="predict-btn" id="predictBtn">Run ML Prediction</button>
+  </div>
+
+  <!-- KPI Results Section -->
+  <div class="section">
+    <div class="section-title">Predicted KPIs</div>
+    <div class="feasibility-bar">
+      <span class="badge feasible" id="feasBadge">Awaiting prediction...</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card c1">
+        <div class="kpi-label">C₈–C₁₆ Rate</div>
+        <div class="kpi-value" id="kpi_rate">--</div>
+        <div class="kpi-unit">kg/h</div>
+      </div>
+      <div class="kpi-card c2">
+        <div class="kpi-label">C₈–C₁₆ Fraction</div>
+        <div class="kpi-value" id="kpi_frac">--</div>
+        <div class="kpi-unit">% mass</div>
+      </div>
+      <div class="kpi-card c3">
+        <div class="kpi-label">Specific Energy</div>
+        <div class="kpi-value" id="kpi_energy">--</div>
+        <div class="kpi-unit">kWh/kg</div>
+      </div>
+      <div class="kpi-card c4">
+        <div class="kpi-label">Compressor Power</div>
+        <div class="kpi-value" id="kpi_comp">--</div>
+        <div class="kpi-unit">MW</div>
+      </div>
+      <div class="kpi-card c5">
+        <div class="kpi-label">Cooling Duty</div>
+        <div class="kpi-value" id="kpi_cool">--</div>
+        <div class="kpi-unit">MW</div>
+      </div>
+      <div class="kpi-card c6">
+        <div class="kpi-label">Pressure Drop</div>
+        <div class="kpi-value" id="kpi_dp">--</div>
+        <div class="kpi-unit">bar (limit 4.0)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Info Section -->
+  <div class="section">
+    <div class="section-title">ML Model Information</div>
+    <p style="color: var(--text-dim); font-size: 13px; margin-bottom: 14px;" id="modelDesc">Loading model metadata...</p>
+    <table class="metrics-table">
+      <thead>
+        <tr><th>Target KPI</th><th>R² Score</th><th>Quality</th></tr>
+      </thead>
+      <tbody id="metricsBody"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  Sultan Qaboos University &middot; College of Engineering &middot; Department of Chemical and Process Engineering<br>
+  Fischer&ndash;Tropsch Reactor ML Surrogate &middot; Powered by Flask + ExtraTreesRegressor
+</footer>
+
+<script>
+const PARAMS = [
+  "temperature_C", "pressure_bar", "ghsv_h", "target_x_co",
+  "total_flow_kmol_h", "tube_inner_diameter_m", "particle_diameter_m",
+  "void_fraction", "purge_fraction"
+];
+
+// Bidirectional sync between sliders and number inputs
+PARAMS.forEach(p => {
+  const rng = document.getElementById("rng_" + p);
+  const num = document.getElementById("num_" + p);
+  rng.addEventListener("input", () => { num.value = rng.value; debouncedPredict(); });
+  num.addEventListener("input", () => { rng.value = num.value; debouncedPredict(); });
+});
+
+function collectParams() {
+  const params = {};
+  PARAMS.forEach(p => { params[p] = parseFloat(document.getElementById("rng_" + p).value); });
+  return params;
+}
+
+let debounceTimer = null;
+function debouncedPredict() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(predict, 350);
+}
+
+async function predict() {
+  try {
+    const res = await fetch("/api/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collectParams())
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      console.error("Prediction error:", err);
+      return;
+    }
+    const data = await res.json();
+    updateUI(data);
+  } catch (e) {
+    console.error("Network error:", e);
+  }
+}
+
+function updateUI(data) {
+  document.getElementById("kpi_rate").textContent  = Math.round(data.target_rate_kgph).toLocaleString();
+  document.getElementById("kpi_frac").textContent  = (data.target_fraction * 100).toFixed(2) + "%";
+  document.getElementById("kpi_energy").textContent = data.specific_energy_kwh_per_kg_target.toFixed(3);
+  document.getElementById("kpi_comp").textContent  = data.compressor_power_mw.toFixed(3);
+  document.getElementById("kpi_cool").textContent  = data.cooling_duty_mw.toFixed(3);
+  document.getElementById("kpi_dp").textContent    = data.delta_p_bar.toFixed(3);
+
+  const badge = document.getElementById("feasBadge");
+  if (data.feasible) {
+    badge.className = "badge feasible";
+    badge.textContent = "✓ FEASIBLE — All constraints satisfied";
+  } else {
+    badge.className = "badge infeasible";
+    badge.textContent = "✗ INFEASIBLE — " + data.violation_reason;
+  }
+
+  // Update SVG annotations
+  const p = collectParams();
+  document.getElementById("kpi-temp").textContent = "T = " + p.temperature_C.toFixed(1) + " °C";
+  document.getElementById("kpi-pres").textContent = "P = " + p.pressure_bar.toFixed(1) + " bar";
+  document.getElementById("kpi-dp").textContent = "ΔP = " + data.delta_p_bar.toFixed(2) + " bar";
+  document.getElementById("kpi-cool").textContent = "Q_cool = " + data.cooling_duty_mw.toFixed(2) + " MW";
+  document.getElementById("kpi-comp").textContent = "W_comp = " + data.compressor_power_mw.toFixed(2) + " MW";
+}
+
+async function loadMetadata() {
+  try {
+    const res = await fetch("/api/metadata");
+    const meta = await res.json();
+    document.getElementById("modelDesc").textContent =
+      "Model: " + meta.model_type + " — Trained on " +
+      meta.n_training_rows.toLocaleString() + " feasible cases out of " +
+      meta.n_cases_completed.toLocaleString() + " simulations.";
+    const tbody = document.getElementById("metricsBody");
+    tbody.innerHTML = "";
+    Object.entries(meta.metrics).forEach(([key, val]) => {
+      const r2 = val.r2;
+      const quality = r2 >= 0.99 ? "Excellent" : r2 >= 0.97 ? "Good" : "Fair";
+      const barWidth = Math.round(r2 * 80);
+      tbody.innerHTML += `<tr>
+        <td>${key.replace(/_/g, " ")}</td>
+        <td><span class="r2-bar" style="width:${barWidth}px"></span>${r2.toFixed(4)}</td>
+        <td>${quality}</td>
+      </tr>`;
+    });
+  } catch (e) {
+    console.error("Failed to load metadata:", e);
+  }
+}
+
+// Initial load
+loadMetadata();
+predict();
+</script>
+
+</body>
+</html>
