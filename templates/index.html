@@ -93,17 +93,83 @@ main {
 
 /* Process diagram */
 .diagram-wrap {
-  display: flex;
-  justify-content: center;
-  background: var(--panel-2);
-  border-radius: 10px;
-  padding: 16px;
+  background: linear-gradient(180deg, #11182a 0%, #0c1120 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 18px 14px;
   overflow-x: auto;
+  position: relative;
+}
+.diagram-wrap::before {
+  content: 'P&ID · FT-001';
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--text-dim);
+  background: rgba(116,185,255,0.08);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Menlo, monospace;
 }
 svg.process-diagram {
   width: 100%;
   max-width: 1100px;
   height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Stream legend */
+.stream-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.stream-legend .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.stream-legend .swatch {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px currentColor;
+}
+.stream-legend .swatch.syngas { background: var(--c1); color: var(--c1); }
+.stream-legend .swatch.product { background: var(--c3); color: var(--c3); }
+.stream-legend .swatch.cooling { background: var(--green); color: var(--green); }
+.stream-legend .swatch.purge { background: var(--text-dim); color: var(--text-dim); }
+
+/* Animated stream flow */
+@keyframes flow-forward {
+  to { stroke-dashoffset: -40; }
+}
+@keyframes flow-slow {
+  to { stroke-dashoffset: -30; }
+}
+.process-diagram .pipe-flow {
+  stroke-dasharray: 8 6;
+  animation: flow-forward 1.6s linear infinite;
+}
+.process-diagram .pipe-flow.slow {
+  animation: flow-slow 2.8s linear infinite;
+}
+.process-diagram .vessel-glow {
+  filter: drop-shadow(0 0 4px rgba(116,185,255,0.35));
 }
 
 /* Sliders grid */
@@ -291,137 +357,380 @@ footer {
   <div class="section">
     <div class="section-title">Fischer&ndash;Tropsch Loop &mdash; Packed Bed Reactor Process Flow</div>
     <div class="diagram-wrap">
-      <svg class="process-diagram" viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg">
+      <svg class="process-diagram" viewBox="0 0 1100 500" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-            <path d="M0,0 L10,5 L0,10 z" fill="#74b9ff"/>
+          <!-- Arrow markers -->
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#4dabf7"/>
           </marker>
-          <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#ffa94d"/>
           </marker>
-          <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#8b95b0"/>
           </marker>
-          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#52b788"/>
           </marker>
-          <linearGradient id="reactorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#2a3556"/>
-            <stop offset="100%" stop-color="#1a2238"/>
+
+          <!-- Engineering grid -->
+          <pattern id="gridDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.8" fill="#2a3557" opacity="0.55"/>
+          </pattern>
+
+          <!-- Vessel shell gradient (3D steel look) -->
+          <linearGradient id="reactorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#1a2138"/>
+            <stop offset="25%"  stop-color="#2f3a5e"/>
+            <stop offset="50%"  stop-color="#3b4876"/>
+            <stop offset="75%"  stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#1a2138"/>
           </linearGradient>
+
+          <!-- Catalyst bed gradient -->
           <linearGradient id="bedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#5a4a3a"/>
-            <stop offset="100%" stop-color="#3a2e22"/>
+            <stop offset="0%"   stop-color="#6a5237"/>
+            <stop offset="100%" stop-color="#3a2a17"/>
           </linearGradient>
+
+          <!-- Temperature overlay (hotter near top outlet) -->
+          <linearGradient id="tempGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%"   stop-color="#4dabf7" stop-opacity="0.08"/>
+            <stop offset="60%"  stop-color="#ffa94d" stop-opacity="0.10"/>
+            <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0.18"/>
+          </linearGradient>
+
+          <!-- Tube cylinder gradient -->
+          <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#3a2a17"/>
+            <stop offset="45%"  stop-color="#8a6d48"/>
+            <stop offset="55%"  stop-color="#9a7d58"/>
+            <stop offset="100%" stop-color="#3a2a17"/>
+          </linearGradient>
+
+          <!-- Equipment radial -->
+          <radialGradient id="mixerGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%"   stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#0f1527"/>
+          </radialGradient>
+          <radialGradient id="sepGrad" cx="50%" cy="30%" r="80%">
+            <stop offset="0%"   stop-color="#2a3350"/>
+            <stop offset="100%" stop-color="#0f1527"/>
+          </radialGradient>
+          <linearGradient id="compGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#131a30"/>
+          </linearGradient>
+
+          <!-- Cooling jacket fill -->
+          <linearGradient id="jacketGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#52b788" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#1b4332" stop-opacity="0.55"/>
+          </linearGradient>
+
+          <!-- Glow filter for reactor -->
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+
+          <!-- Reusable pipe: outer casing stroke then inner colored stroke.
+               Each stream is drawn twice (static outer + animated inner). -->
         </defs>
 
-        <!-- Title labels -->
-        <text x="550" y="20" text-anchor="middle" fill="#74b9ff" font-size="13" font-weight="700">FT MULTITUBULAR PACKED-BED REACTOR LOOP</text>
+        <!-- Engineering grid background -->
+        <rect x="0" y="0" width="1100" height="500" fill="url(#gridDots)"/>
 
-        <!-- Syngas Feed -->
-        <text x="50" y="100" fill="#4dabf7" font-size="12" font-weight="700">SYNGAS FEED</text>
-        <text x="50" y="115" fill="#8b95b0" font-size="10">H₂ + CO</text>
-        <line x1="50" y1="130" x2="180" y2="130" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-
-        <!-- Mixer -->
-        <circle cx="200" cy="130" r="20" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
-        <text x="200" y="135" text-anchor="middle" fill="#74b9ff" font-size="14" font-weight="700">M</text>
-        <text x="200" y="170" text-anchor="middle" fill="#8b95b0" font-size="10">Mixer</text>
-
-        <!-- Mixer to reactor inlet (bottom) -->
-        <line x1="220" y1="130" x2="280" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="280" y1="130" x2="280" y2="380" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="280" y1="380" x2="380" y2="380" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-        <text x="295" y="250" fill="#8b95b0" font-size="10">Reactor inlet</text>
-
-        <!-- REACTOR VESSEL -->
-        <rect x="400" y="80" width="200" height="320" rx="12" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2.5"/>
-        <text x="500" y="70" text-anchor="middle" fill="#74b9ff" font-size="12" font-weight="700">PACKED BED REACTOR</text>
-
-        <!-- Cooling water jacket (outer rectangle) -->
-        <rect x="392" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
-        <rect x="600" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
-
-        <!-- Tube bundle (vertical lines representing tubes) -->
-        <g stroke="#5a4a3a" stroke-width="6" stroke-linecap="round">
-          <line x1="420" y1="110" x2="420" y2="370"/>
-          <line x1="440" y1="110" x2="440" y2="370"/>
-          <line x1="460" y1="110" x2="460" y2="370"/>
-          <line x1="480" y1="110" x2="480" y2="370"/>
-          <line x1="500" y1="110" x2="500" y2="370"/>
-          <line x1="520" y1="110" x2="520" y2="370"/>
-          <line x1="540" y1="110" x2="540" y2="370"/>
-          <line x1="560" y1="110" x2="560" y2="370"/>
-          <line x1="580" y1="110" x2="580" y2="370"/>
-        </g>
-        <!-- Catalyst pellets pattern overlay -->
-        <g fill="#ffa94d" opacity="0.6">
-          <circle cx="420" cy="150" r="2"/><circle cx="440" cy="160" r="2"/><circle cx="460" cy="155" r="2"/>
-          <circle cx="480" cy="170" r="2"/><circle cx="500" cy="150" r="2"/><circle cx="520" cy="165" r="2"/>
-          <circle cx="540" cy="160" r="2"/><circle cx="560" cy="155" r="2"/><circle cx="580" cy="170" r="2"/>
-          <circle cx="420" cy="220" r="2"/><circle cx="440" cy="210" r="2"/><circle cx="460" cy="225" r="2"/>
-          <circle cx="480" cy="215" r="2"/><circle cx="500" cy="220" r="2"/><circle cx="520" cy="210" r="2"/>
-          <circle cx="540" cy="225" r="2"/><circle cx="560" cy="215" r="2"/><circle cx="580" cy="220" r="2"/>
-          <circle cx="420" cy="290" r="2"/><circle cx="440" cy="300" r="2"/><circle cx="460" cy="285" r="2"/>
-          <circle cx="480" cy="295" r="2"/><circle cx="500" cy="290" r="2"/><circle cx="520" cy="300" r="2"/>
-          <circle cx="540" cy="285" r="2"/><circle cx="560" cy="295" r="2"/><circle cx="580" cy="290" r="2"/>
+        <!-- Diagram title bar -->
+        <g>
+          <rect x="360" y="4" width="380" height="22" rx="11" fill="#0f1d3a" stroke="#2e3757"/>
+          <text x="550" y="19" text-anchor="middle" fill="#74b9ff" font-size="11" font-weight="800" letter-spacing="1.5">
+            FT MULTITUBULAR PACKED-BED REACTOR LOOP
+          </text>
         </g>
 
-        <text x="500" y="240" text-anchor="middle" fill="#e8eaf6" font-size="11" font-weight="700">Co Catalyst</text>
-        <text x="500" y="255" text-anchor="middle" fill="#8b95b0" font-size="10">Tube Bundle</text>
+        <!-- =========================================================
+             STREAM 1 · SYNGAS FEED  (blue, left)
+             ========================================================= -->
+        <g>
+          <rect x="36" y="90" width="118" height="32" rx="6" fill="#0f1d3a" stroke="#4dabf7" stroke-opacity="0.55"/>
+          <text x="95" y="104" text-anchor="middle" fill="#4dabf7" font-size="11" font-weight="800" letter-spacing="0.8">SYNGAS FEED</text>
+          <text x="95" y="116" text-anchor="middle" fill="#8b95b0" font-size="9">H₂ + CO</text>
+        </g>
+        <!-- Pipe: feed → mixer -->
+        <path d="M 50,140 L 178,140" fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 50,140 L 178,140" fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr)"/>
 
-        <!-- Cooling water in/out -->
-        <line x1="340" y1="110" x2="392" y2="110" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
-        <text x="340" y="100" text-anchor="end" fill="#52b788" font-size="10" font-weight="700">CW in</text>
-        <line x1="608" y1="370" x2="660" y2="370" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
-        <text x="665" y="375" fill="#52b788" font-size="10" font-weight="700">CW out</text>
+        <!-- =========================================================
+             EQUIPMENT · MIXER
+             ========================================================= -->
+        <g>
+          <circle cx="200" cy="140" r="22" fill="url(#mixerGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <line x1="184" y1="140" x2="216" y2="140" stroke="#74b9ff" stroke-width="1" opacity="0.6"/>
+          <line x1="200" y1="124" x2="200" y2="156" stroke="#74b9ff" stroke-width="1" opacity="0.6"/>
+          <text x="200" y="144" text-anchor="middle" fill="#e8eaf6" font-size="13" font-weight="800">M</text>
+          <rect x="178" y="172" width="44" height="16" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="200" y="183" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="700" letter-spacing="0.8">MX-01</text>
+        </g>
 
-        <!-- Reactor outlet (top) -->
-        <line x1="500" y1="80" x2="500" y2="50" stroke="#ffa94d" stroke-width="3"/>
-        <line x1="500" y1="50" x2="780" y2="50" stroke="#ffa94d" stroke-width="3"/>
-        <line x1="780" y1="50" x2="780" y2="170" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
-        <text x="640" y="42" fill="#ffa94d" font-size="10">Reactor outlet (HC + unreacted syngas)</text>
+        <!-- =========================================================
+             STREAM · Mixer → Reactor inlet (bottom)
+             ========================================================= -->
+        <path d="M 222,140 L 270,140 Q 280,140 280,150 L 280,390 Q 280,400 290,400 L 384,400"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 222,140 L 270,140 Q 280,140 280,150 L 280,390 Q 280,400 290,400 L 384,400"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr)"/>
+        <g>
+          <rect x="294" y="246" width="72" height="16" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="330" y="257" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="600">REACTOR INLET</text>
+        </g>
 
-        <!-- SEPARATOR -->
-        <ellipse cx="820" cy="220" rx="60" ry="50" fill="#1e2433" stroke="#74b9ff" stroke-width="2.5"/>
-        <line x1="760" y1="220" x2="880" y2="220" stroke="#74b9ff" stroke-width="1" stroke-dasharray="3,3"/>
-        <text x="820" y="200" text-anchor="middle" fill="#74b9ff" font-size="11" font-weight="700">SEPARATOR</text>
-        <text x="820" y="245" text-anchor="middle" fill="#8b95b0" font-size="9">Gas / Liquid</text>
+        <!-- =========================================================
+             COOLING JACKET  (wraps vessel)
+             ========================================================= -->
+        <g opacity="0.95">
+          <!-- Left jacket wall -->
+          <path d="M 388,110 Q 388,92 406,92 L 406,400 Q 388,400 388,382 Z"
+                fill="url(#jacketGrad)" stroke="#52b788" stroke-width="1" opacity="0.85"/>
+          <!-- Right jacket wall -->
+          <path d="M 612,110 Q 612,92 594,92 L 594,400 Q 612,400 612,382 Z"
+                fill="url(#jacketGrad)" stroke="#52b788" stroke-width="1" opacity="0.85"/>
+          <!-- Jacket flow chevrons (upward on left wall) -->
+          <g fill="none" stroke="#52b788" stroke-width="1.4" opacity="0.7">
+            <polyline points="393,200 397,195 393,190"/>
+            <polyline points="393,260 397,255 393,250"/>
+            <polyline points="393,320 397,315 393,310"/>
+          </g>
+        </g>
 
-        <!-- Liquid product out (bottom of separator) -->
-        <line x1="820" y1="270" x2="820" y2="380" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
-        <text x="830" y="395" fill="#ffa94d" font-size="11" font-weight="700">C₈–C₁₆ PRODUCT</text>
-        <text x="830" y="408" fill="#8b95b0" font-size="9">Diesel range</text>
+        <!-- =========================================================
+             REACTOR VESSEL  (domed pressure vessel)
+             ========================================================= -->
+        <g class="vessel-glow">
+          <!-- Body (straight shell) -->
+          <rect x="406" y="110" width="188" height="290" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Top hemispheric head -->
+          <path d="M 406,110 Q 500,62 594,110 Z" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Bottom hemispheric head -->
+          <path d="M 406,400 Q 500,448 594,400 Z" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Subtle highlight edge -->
+          <line x1="416" y1="120" x2="416" y2="390" stroke="#8ea8d9" stroke-width="1" opacity="0.35"/>
+        </g>
 
-        <!-- Gas top of separator -> Compressor -->
-        <line x1="820" y1="170" x2="820" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="820" y1="130" x2="980" y2="130" stroke="#4dabf7" stroke-width="3"/>
+        <!-- Tag -->
+        <g>
+          <rect x="446" y="70" width="108" height="18" rx="9" fill="#0f1d3a" stroke="#74b9ff" stroke-width="1"/>
+          <text x="500" y="83" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="800" letter-spacing="1.2">R-101 · PACKED BED</text>
+        </g>
 
-        <!-- Compressor -->
-        <polygon points="980,115 1010,100 1010,160 980,145" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
-        <text x="995" y="180" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="700">COMP</text>
+        <!-- Temperature overlay (inside vessel body) -->
+        <rect x="408" y="112" width="184" height="286" fill="url(#tempGrad)" opacity="0.9"/>
 
-        <!-- Recycle path back to mixer (top route) -->
-        <line x1="1010" y1="130" x2="1050" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="1050" y1="130" x2="1050" y2="40" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="1050" y1="40" x2="200" y2="40" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="200" y1="40" x2="200" y2="110" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-        <text x="600" y="32" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">RECYCLE LOOP</text>
+        <!-- Tube bundle (cylindrical look: dark base + light highlight) -->
+        <g>
+          <!-- Darker tube body -->
+          <g stroke="url(#tubeGrad)" stroke-width="10" stroke-linecap="round">
+            <line x1="425" y1="125" x2="425" y2="385"/>
+            <line x1="449" y1="125" x2="449" y2="385"/>
+            <line x1="473" y1="125" x2="473" y2="385"/>
+            <line x1="497" y1="125" x2="497" y2="385"/>
+            <line x1="521" y1="125" x2="521" y2="385"/>
+            <line x1="545" y1="125" x2="545" y2="385"/>
+            <line x1="569" y1="125" x2="569" y2="385"/>
+          </g>
+          <!-- Highlight streak -->
+          <g stroke="#e0c490" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
+            <line x1="423" y1="130" x2="423" y2="380"/>
+            <line x1="447" y1="130" x2="447" y2="380"/>
+            <line x1="471" y1="130" x2="471" y2="380"/>
+            <line x1="495" y1="130" x2="495" y2="380"/>
+            <line x1="519" y1="130" x2="519" y2="380"/>
+            <line x1="543" y1="130" x2="543" y2="380"/>
+            <line x1="567" y1="130" x2="567" y2="380"/>
+          </g>
+        </g>
 
-        <!-- Purge -->
-        <line x1="1030" y1="130" x2="1030" y2="220" stroke="#8b95b0" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
-        <text x="1040" y="225" fill="#8b95b0" font-size="10" font-weight="700">PURGE</text>
-        <text x="1040" y="237" fill="#8b95b0" font-size="9">(inerts)</text>
+        <!-- Catalyst pellets (denser, varied radii) -->
+        <g fill="#ffa94d" opacity="0.75">
+          <circle cx="425" cy="150" r="1.8"/><circle cx="449" cy="158" r="2.2"/><circle cx="473" cy="152" r="1.6"/>
+          <circle cx="497" cy="164" r="2.0"/><circle cx="521" cy="150" r="1.8"/><circle cx="545" cy="160" r="2.1"/>
+          <circle cx="569" cy="154" r="1.7"/>
+          <circle cx="437" cy="175" r="1.5"/><circle cx="461" cy="182" r="1.9"/><circle cx="485" cy="178" r="2.0"/>
+          <circle cx="509" cy="172" r="1.6"/><circle cx="533" cy="184" r="1.9"/><circle cx="557" cy="178" r="1.7"/>
+          <circle cx="425" cy="210" r="2.0"/><circle cx="449" cy="220" r="1.7"/><circle cx="473" cy="215" r="2.1"/>
+          <circle cx="497" cy="208" r="1.8"/><circle cx="521" cy="222" r="1.9"/><circle cx="545" cy="216" r="2.0"/>
+          <circle cx="569" cy="212" r="1.7"/>
+          <circle cx="437" cy="248" r="1.6"/><circle cx="461" cy="254" r="2.0"/><circle cx="485" cy="246" r="1.8"/>
+          <circle cx="509" cy="258" r="1.9"/><circle cx="533" cy="250" r="1.7"/><circle cx="557" cy="260" r="2.1"/>
+          <circle cx="425" cy="290" r="1.9"/><circle cx="449" cy="298" r="1.7"/><circle cx="473" cy="286" r="2.0"/>
+          <circle cx="497" cy="294" r="1.8"/><circle cx="521" cy="300" r="1.6"/><circle cx="545" cy="286" r="2.0"/>
+          <circle cx="569" cy="296" r="1.8"/>
+          <circle cx="437" cy="328" r="1.7"/><circle cx="461" cy="334" r="2.0"/><circle cx="485" cy="326" r="1.8"/>
+          <circle cx="509" cy="338" r="1.9"/><circle cx="533" cy="330" r="2.1"/><circle cx="557" cy="336" r="1.7"/>
+          <circle cx="425" cy="362" r="1.9"/><circle cx="449" cy="370" r="1.7"/><circle cx="473" cy="365" r="2.0"/>
+          <circle cx="497" cy="358" r="1.8"/><circle cx="521" cy="372" r="1.9"/><circle cx="545" cy="366" r="2.1"/>
+          <circle cx="569" cy="362" r="1.7"/>
+        </g>
 
-        <!-- Live KPI annotations on diagram -->
-        <g id="kpiAnnotations">
-          <text id="kpi-temp" x="500" y="100" text-anchor="middle" fill="#ffa94d" font-size="10" font-weight="700">T = -- °C</text>
-          <text id="kpi-pres" x="500" y="385" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">P = -- bar</text>
-          <text id="kpi-dp" x="660" y="320" fill="#ff6b6b" font-size="10" font-weight="700">ΔP = -- bar</text>
-          <text id="kpi-cool" x="660" y="335" fill="#52b788" font-size="10" font-weight="700">Q_cool = -- MW</text>
-          <text id="kpi-comp" x="930" y="100" fill="#cc5de8" font-size="10" font-weight="700">W_comp = -- MW</text>
+        <!-- Vessel center text panel -->
+        <g>
+          <rect x="440" y="230" width="120" height="36" rx="4" fill="#0b1328" stroke="#2e3757" opacity="0.9"/>
+          <text x="500" y="246" text-anchor="middle" fill="#e8eaf6" font-size="11" font-weight="800" letter-spacing="0.8">Co CATALYST</text>
+          <text x="500" y="260" text-anchor="middle" fill="#8b95b0" font-size="9">Tube Bundle · Ø 42 mm</text>
+        </g>
+
+        <!-- =========================================================
+             COOLING WATER streams (in top-left / out bottom-right)
+             ========================================================= -->
+        <!-- CW IN -->
+        <path d="M 330,115 L 388,115" fill="none" stroke="#0b1328" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 330,115 L 388,115" fill="none" stroke="#52b788" stroke-width="3" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr-green)"/>
+        <g>
+          <rect x="284" y="98" width="46" height="14" rx="3" fill="#0f1527" stroke="#52b788" stroke-opacity="0.6"/>
+          <text x="307" y="108" text-anchor="middle" fill="#52b788" font-size="9" font-weight="700">CW IN</text>
+        </g>
+        <!-- CW OUT -->
+        <path d="M 612,385 L 670,385" fill="none" stroke="#0b1328" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 612,385 L 670,385" fill="none" stroke="#52b788" stroke-width="3" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr-green)"/>
+        <g>
+          <rect x="670" y="378" width="52" height="14" rx="3" fill="#0f1527" stroke="#52b788" stroke-opacity="0.6"/>
+          <text x="696" y="388" text-anchor="middle" fill="#52b788" font-size="9" font-weight="700">CW OUT</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Reactor outlet (top) → Separator
+             ========================================================= -->
+        <path d="M 500,62 L 500,46 Q 500,36 510,36 L 780,36 Q 790,36 790,46 L 790,170"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 500,62 L 500,46 Q 500,36 510,36 L 780,36 Q 790,36 790,46 L 790,170"
+              fill="none" stroke="#ffa94d" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr-orange)"/>
+        <g>
+          <rect x="582" y="20" width="146" height="14" rx="3" fill="#0f1527" stroke="#ffa94d" stroke-opacity="0.5"/>
+          <text x="655" y="30" text-anchor="middle" fill="#ffa94d" font-size="9" font-weight="700" letter-spacing="0.5">REACTOR OUT · HC + SYNGAS</text>
+        </g>
+
+        <!-- =========================================================
+             EQUIPMENT · SEPARATOR (flash drum)
+             ========================================================= -->
+        <g>
+          <!-- Vertical capsule -->
+          <rect x="762" y="178" width="56" height="110" rx="28" fill="url(#sepGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <!-- Liquid level line -->
+          <line x1="762" y1="248" x2="818" y2="248" stroke="#ffa94d" stroke-width="1.3" stroke-dasharray="3,2" opacity="0.8"/>
+          <!-- Liquid zone shading -->
+          <rect x="763" y="249" width="54" height="38" fill="#ffa94d" opacity="0.08"/>
+          <!-- Label -->
+          <rect x="745" y="162" width="90" height="14" rx="3" fill="#0f1d3a" stroke="#74b9ff" stroke-width="0.8"/>
+          <text x="790" y="172" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="800" letter-spacing="1">V-201 · SEPARATOR</text>
+          <!-- Phase labels inside -->
+          <text x="790" y="215" text-anchor="middle" fill="#8b95b0" font-size="8" font-weight="700">GAS</text>
+          <text x="790" y="273" text-anchor="middle" fill="#ffa94d" font-size="8" font-weight="700" opacity="0.85">LIQUID</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Liquid product (separator bottom → out)
+             ========================================================= -->
+        <path d="M 790,288 L 790,410" fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 790,288 L 790,410" fill="none" stroke="#ffa94d" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr-orange)"/>
+        <g>
+          <rect x="722" y="418" width="136" height="34" rx="6" fill="#2a1a0a" stroke="#ffa94d"/>
+          <text x="790" y="432" text-anchor="middle" fill="#ffa94d" font-size="11" font-weight="800" letter-spacing="0.8">C₈–C₁₆ PRODUCT</text>
+          <text x="790" y="446" text-anchor="middle" fill="#8b95b0" font-size="9">Diesel range</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Gas (separator top) → Compressor
+             ========================================================= -->
+        <path d="M 790,178 L 790,140 Q 790,128 800,128 L 978,128"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 790,178 L 790,140 Q 790,128 800,128 L 978,128"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow"/>
+
+        <!-- =========================================================
+             EQUIPMENT · COMPRESSOR
+             ========================================================= -->
+        <g>
+          <polygon points="978,112 1014,96 1014,160 978,144" fill="url(#compGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <!-- Rotor hint -->
+          <polyline points="988,120 996,128 988,136" fill="none" stroke="#74b9ff" stroke-width="1.2" opacity="0.7"/>
+          <polyline points="1000,120 1008,128 1000,136" fill="none" stroke="#74b9ff" stroke-width="1.2" opacity="0.7"/>
+          <rect x="974" y="168" width="48" height="14" rx="3" fill="#0f1d3a" stroke="#74b9ff" stroke-width="0.8"/>
+          <text x="998" y="178" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="800" letter-spacing="1">K-101</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Recycle loop (top route back to mixer)
+             ========================================================= -->
+        <path d="M 1014,128 Q 1054,128 1054,88 L 1054,50 Q 1054,40 1044,40 L 210,40 Q 200,40 200,50 L 200,118"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 1014,128 Q 1054,128 1054,88 L 1054,50 Q 1054,40 1044,40 L 210,40 Q 200,40 200,50 L 200,118"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr)"/>
+        <g>
+          <rect x="540" y="50" width="120" height="14" rx="3" fill="#0f1527" stroke="#4dabf7" stroke-opacity="0.5"/>
+          <text x="600" y="60" text-anchor="middle" fill="#4dabf7" font-size="9" font-weight="700" letter-spacing="1">RECYCLE LOOP</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Purge (dashed, gray)
+             ========================================================= -->
+        <path d="M 1040,128 L 1040,220" fill="none" stroke="#8b95b0" stroke-width="2"
+              stroke-dasharray="5,4" marker-end="url(#arr-gray)"/>
+        <g>
+          <rect x="1048" y="210" width="48" height="26" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="1072" y="221" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="700" letter-spacing="0.8">PURGE</text>
+          <text x="1072" y="232" text-anchor="middle" fill="#8b95b0" font-size="8">(inerts)</text>
+        </g>
+
+        <!-- =========================================================
+             LIVE KPI ANNOTATIONS  (IDs preserved for JS binding)
+             ========================================================= -->
+        <g id="kpiAnnotations" font-family="SFMono-Regular, Menlo, monospace">
+          <!-- T -->
+          <g>
+            <rect x="458" y="100" width="84" height="16" rx="3" fill="#2a1a0a" stroke="#ffa94d" stroke-opacity="0.65"/>
+            <text id="kpi-temp" x="500" y="111" text-anchor="middle" fill="#ffa94d" font-size="10" font-weight="800">T = -- °C</text>
+          </g>
+          <!-- P -->
+          <g>
+            <rect x="458" y="384" width="84" height="16" rx="3" fill="#0d1b33" stroke="#4dabf7" stroke-opacity="0.65"/>
+            <text id="kpi-pres" x="500" y="395" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="800">P = -- bar</text>
+          </g>
+          <!-- ΔP -->
+          <g>
+            <rect x="626" y="306" width="100" height="16" rx="3" fill="#2a0c10" stroke="#ff6b6b" stroke-opacity="0.65"/>
+            <text id="kpi-dp" x="676" y="317" text-anchor="middle" fill="#ff6b6b" font-size="10" font-weight="800">ΔP = -- bar</text>
+          </g>
+          <!-- Q_cool -->
+          <g>
+            <rect x="626" y="326" width="100" height="16" rx="3" fill="#0f2a1c" stroke="#52b788" stroke-opacity="0.65"/>
+            <text id="kpi-cool" x="676" y="337" text-anchor="middle" fill="#52b788" font-size="10" font-weight="800">Q_cool = -- MW</text>
+          </g>
+          <!-- W_comp -->
+          <g>
+            <rect x="928" y="86" width="108" height="16" rx="3" fill="#210e2a" stroke="#cc5de8" stroke-opacity="0.65"/>
+            <text id="kpi-comp" x="982" y="97" text-anchor="middle" fill="#cc5de8" font-size="10" font-weight="800">W_comp = -- MW</text>
+          </g>
         </g>
       </svg>
+
+      <!-- Stream legend -->
+      <div class="stream-legend">
+        <div class="item"><span class="swatch syngas"></span>Syngas / Recycle</div>
+        <div class="item"><span class="swatch product"></span>Hydrocarbon Product</div>
+        <div class="item"><span class="swatch cooling"></span>Cooling Water</div>
+        <div class="item"><span class="swatch purge"></span>Purge (Inerts)</div>
+      </div>
     </div>
   </div>
 
