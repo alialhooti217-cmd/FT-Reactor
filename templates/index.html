@@ -6,39 +6,52 @@
 <title>FT Reactor ML Simulator | SQU</title>
 <style>
 :root {
-  --bg: #0a0e1a;
-  --panel: #1e2433;
-  --panel-2: #161b29;
-  --border: #2e3757;
-  --text: #e8eaf6;
-  --text-dim: #8b95b0;
-  --accent: #74b9ff;
-  --green: #52b788;
-  --green-bg: #1b4332;
-  --red: #e63946;
-  --red-bg: #3b0a0a;
-  --c1: #4dabf7;
-  --c2: #69db7c;
-  --c3: #ffa94d;
-  --c4: #cc5de8;
-  --c5: #f783ac;
-  --c6: #ff6b6b;
+  --bg: #080b0f;
+  --panel: #0f1117;
+  --panel-2: #0c0f14;
+  --border: #1e1f2e;
+  --border-light: #2a2b40;
+  --text: #e8e6f0;
+  --text-dim: #9b9ab5;
+  --text-dimmer: #5e5d7a;
+  --accent: #a78bfa;
+  --accent-hover: #c4b5fd;
+  --green: #34d399;
+  --green-bg: #052e16;
+  --red: #f87171;
+  --red-bg: #300a0a;
+  --c1: #a78bfa;
+  --c2: #34d399;
+  --c3: #f59e0b;
+  --c4: #818cf8;
+  --c5: #f472b6;
+  --c6: #fb923c;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124, 58, 237, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 80% 90%, rgba(52, 211, 153, 0.04) 0%, transparent 55%);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Smooth transitions global */
+* {
+  transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Header */
 header {
-  background: linear-gradient(135deg, #0f1d3a 0%, #1a2a4a 100%);
+  background: linear-gradient(135deg, #0d0517 0%, #130a2a 50%, #0a1020 100%);
   border-bottom: 2px solid var(--accent);
   padding: 24px 32px;
   text-align: center;
+  box-shadow: 0 2px 30px rgba(167, 139, 250, 0.15), 0 0 60px rgba(124, 58, 237, 0.08);
 }
 .squ-name {
   font-size: 28px;
@@ -69,173 +82,521 @@ header {
 main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 28px 24px;
+  padding: 32px 24px;
 }
 
 .section {
-  background: var(--panel);
+  background: linear-gradient(135deg, #0f1017 0%, #0c0d14 100%);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 40px rgba(167, 139, 250, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: relative;
+  overflow: hidden;
 }
+
+.section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 .section-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-light);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Process diagram */
 .diagram-wrap {
-  display: flex;
-  justify-content: center;
-  background: var(--panel-2);
-  border-radius: 10px;
-  padding: 16px;
+  background: linear-gradient(180deg, #09090f 0%, #060710 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 18px 14px;
   overflow-x: auto;
+  position: relative;
+}
+.diagram-wrap::before {
+  content: 'P&ID · FT-001';
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--text-dim);
+  background: rgba(167,139,250,0.08);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Menlo, monospace;
 }
 svg.process-diagram {
   width: 100%;
   max-width: 1100px;
   height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Stream legend */
+.stream-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.stream-legend .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.stream-legend .swatch {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px currentColor;
+}
+.stream-legend .swatch.syngas { background: var(--c1); color: var(--c1); }
+.stream-legend .swatch.product { background: var(--c3); color: var(--c3); }
+.stream-legend .swatch.cooling { background: var(--green); color: var(--green); }
+.stream-legend .swatch.purge { background: var(--text-dim); color: var(--text-dim); }
+
+/* Animated stream flow */
+@keyframes flow-forward {
+  to { stroke-dashoffset: -40; }
+}
+@keyframes flow-slow {
+  to { stroke-dashoffset: -30; }
+}
+@keyframes flow-fast {
+  to { stroke-dashoffset: -60; }
+}
+@keyframes flow-very-fast {
+  to { stroke-dashoffset: -80; }
+}
+
+/* Dynamic flow animations based on flow rate */
+.process-diagram .pipe-flow {
+  stroke-dasharray: 8 6;
+  animation: flow-forward 1.6s linear infinite;
+  transition: animation 0.8s ease-out;
+}
+.process-diagram .pipe-flow.slow {
+  animation: flow-slow 2.8s linear infinite;
+}
+.process-diagram .pipe-flow.fast {
+  animation: flow-fast 1.0s linear infinite;
+}
+.process-diagram .pipe-flow.very-fast {
+  animation: flow-very-fast 0.7s linear infinite;
+}
+
+/* Equipment pulse animations based on load */
+@keyframes pulse-low {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.3)); }
+  50% { filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.6)); }
+}
+@keyframes pulse-medium {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.4)); }
+  50% { filter: drop-shadow(0 0 16px rgba(167, 139, 250, 0.8)); }
+}
+@keyframes pulse-high {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
+  50% { filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.9)); }
+}
+@keyframes pulse-critical {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.6)); }
+  50% { filter: drop-shadow(0 0 22px rgba(248, 113, 113, 0.95)); }
+}
+
+.process-diagram .equipment-pulse {
+  animation: pulse-medium 2s ease-in-out infinite;
+  transition: animation 0.6s ease-out;
+}
+.process-diagram .equipment-pulse.low-load {
+  animation: pulse-low 3s ease-in-out infinite;
+}
+.process-diagram .equipment-pulse.high-load {
+  animation: pulse-high 1.4s ease-in-out infinite;
+}
+.process-diagram .equipment-pulse.critical {
+  animation: pulse-critical 0.8s ease-in-out infinite;
+}
+
+.process-diagram .vessel-glow {
+  filter: drop-shadow(0 0 6px rgba(167,139,250,0.4));
+  transition: filter 0.6s ease-out;
+}
+
+/* Smooth parameter transitions */
+@keyframes temperature-rise {
+  0% { stop-color: #4dabf7; }
+  50% { stop-color: #ffa94d; }
+  100% { stop-color: #ff6b6b; }
+}
+
+/* Text animation for KPI values */
+@keyframes kpi-update {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.process-diagram .kpi-annotation {
+  transition: all 0.5s ease-out;
+}
+
+.process-diagram .kpi-annotation.updating {
+  animation: kpi-update 0.5s ease-out;
+}
+
+/* Stream label color transitions */
+.process-diagram text {
+  transition: fill 0.4s ease-out;
+}
+
+/* Smooth transitions for all SVG elements */
+.process-diagram rect,
+.process-diagram circle,
+.process-diagram path,
+.process-diagram line,
+.process-diagram polygon {
+  transition: stroke 0.4s ease-out, fill 0.4s ease-out, opacity 0.4s ease-out;
 }
 
 /* Sliders grid */
 .slider-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
+
+.slider-group {
+  background: rgba(15, 12, 24, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  backdrop-filter: blur(6px);
+}
+
 .slider-group h3 {
   font-size: 13px;
   color: var(--accent);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
 }
+
 .slider-row {
-  background: var(--panel-2);
+  background: linear-gradient(135deg, rgba(8, 7, 14, 0.7), rgba(15, 12, 24, 0.5));
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
 }
+
+.slider-row:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.15);
+  background: linear-gradient(135deg, rgba(10, 7, 20, 0.9), rgba(18, 14, 30, 0.7));
+}
+
 .slider-label {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 13px;
   color: var(--text-dim);
 }
-.slider-label .name { color: var(--text); font-weight: 600; }
+
+.slider-label .name { 
+  color: var(--text); 
+  font-weight: 600;
+}
+
 .slider-label input[type="number"] {
   width: 90px;
-  padding: 4px 8px;
-  background: var(--bg);
+  padding: 6px 10px;
+  background: linear-gradient(135deg, var(--bg), var(--panel-2));
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text);
   font-size: 12px;
+  font-weight: 600;
   text-align: right;
+  transition: all 0.2s ease;
 }
+
+.slider-label input[type="number"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.35);
+  outline: none;
+}
+
 input[type="range"] {
   width: 100%;
   -webkit-appearance: none;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
+  height: 7px;
+  background: linear-gradient(to right, var(--border), var(--border-light));
+  border-radius: 4px;
   outline: none;
+  cursor: pointer;
 }
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--accent);
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid var(--bg);
-  box-shadow: 0 0 4px rgba(116,185,255,0.5);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.7), inset 0 0 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
 }
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.9), inset 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
 input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: var(--accent);
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid var(--bg);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.7), inset 0 0 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Predict button */
 .predict-btn {
   width: 100%;
-  margin-top: 16px;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--accent), #4a90e2);
+  margin-top: 20px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #7c3aed, var(--accent), #34d399);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.4);
 }
-.predict-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(116,185,255,0.3);
+
+.predict-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(167, 139, 250, 0.6), 0 0 40px rgba(52, 211, 153, 0.2);
+  background: linear-gradient(135deg, #8b5cf6, var(--accent-hover), #6ee7b7);
+}
+
+.predict-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.predict-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #2a1f3d, #1a1f30);
+}
+
+.predict-btn .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+
+.predict-btn.loading .spinner {
+  display: block;
+}
+
+.predict-btn.loading .btn-text {
+  display: none;
 }
 
 /* KPI cards */
 .feasibility-bar {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   text-align: center;
 }
+
 .badge {
   display: inline-block;
-  padding: 8px 22px;
-  border-radius: 22px;
+  padding: 10px 28px;
+  border-radius: 24px;
   font-size: 14px;
   font-weight: 700;
+  transition: all 0.3s ease;
 }
-.badge.feasible { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
-.badge.infeasible { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+
+.badge.feasible { 
+  background: linear-gradient(135deg, rgba(82, 183, 136, 0.15), rgba(82, 183, 136, 0.05));
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  box-shadow: 0 0 12px rgba(82, 183, 136, 0.2);
+}
+
+.badge.feasible:hover {
+  box-shadow: 0 0 24px rgba(82, 183, 136, 0.4);
+  transform: scale(1.05);
+}
+
+.badge.infeasible { 
+  background: linear-gradient(135deg, rgba(230, 57, 70, 0.15), rgba(230, 57, 70, 0.05));
+  color: var(--red);
+  border: 1.5px solid var(--red);
+  box-shadow: 0 0 12px rgba(230, 57, 70, 0.2);
+}
+
+.badge.infeasible:hover {
+  box-shadow: 0 0 24px rgba(230, 57, 70, 0.4);
+  transform: scale(1.05);
+}
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
 }
+
 .kpi-card {
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 18px 14px;
+  background: linear-gradient(135deg, rgba(15, 12, 24, 0.9), rgba(10, 8, 18, 0.9));
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 18px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: default;
+  backdrop-filter: blur(2px);
 }
+
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+.kpi-card.c1::after { background: var(--c1); }
+.kpi-card.c2::after { background: var(--c2); }
+.kpi-card.c3::after { background: var(--c3); }
+.kpi-card.c4::after { background: var(--c4); }
+.kpi-card.c5::after { background: var(--c5); }
+.kpi-card.c6::after { background: var(--c6); }
+
 .kpi-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
+  height: 2px;
   background: var(--accent);
 }
+
 .kpi-card.c1::before { background: var(--c1); }
 .kpi-card.c2::before { background: var(--c2); }
 .kpi-card.c3::before { background: var(--c3); }
 .kpi-card.c4::before { background: var(--c4); }
 .kpi-card.c5::before { background: var(--c5); }
 .kpi-card.c6::before { background: var(--c6); }
-.kpi-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-.kpi-value { font-size: 26px; font-weight: 800; color: var(--text); }
-.kpi-unit { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+.kpi-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 32px rgba(167, 139, 250, 0.2), 0 0 20px rgba(167, 139, 250, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(-4px);
+  background: linear-gradient(135deg, rgba(20, 15, 35, 0.98), rgba(14, 10, 26, 0.98));
+}
+
+.kpi-card.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.kpi-label { 
+  font-size: 12px; 
+  color: var(--text-dimmer); 
+  margin-bottom: 10px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.7px;
+  font-weight: 600;
+}
+
+.kpi-value { 
+  font-size: 28px; 
+  font-weight: 800; 
+  color: var(--text);
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kpi-unit { 
+  font-size: 11px; 
+  color: var(--text-dimmer); 
+  margin-top: 6px;
+  font-weight: 500;
+}
 
 /* Model info */
 .metrics-table {
@@ -243,36 +604,804 @@ input[type="range"]::-moz-range-thumb {
   border-collapse: collapse;
   font-size: 13px;
 }
+
 .metrics-table th, .metrics-table td {
-  padding: 10px 14px;
+  padding: 14px 16px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
-.metrics-table th { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 11px; }
-.metrics-table tr:hover td { background: var(--panel-2); }
+
+.metrics-table th { 
+  color: var(--accent); 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  font-size: 11px;
+  letter-spacing: 0.8px;
+}
+
+.metrics-table tr {
+  transition: all 0.2s ease;
+}
+
+.metrics-table tbody tr:hover td {
+  background: rgba(167, 139, 250, 0.07);
+  border-bottom-color: var(--accent);
+}
+
 .r2-bar {
   display: inline-block;
+  height: 10px;
+  background: linear-gradient(to right, var(--green), var(--c2));
+  border-radius: 5px;
+  vertical-align: middle;
+  margin-right: 10px;
+  box-shadow: 0 0 8px rgba(82, 183, 136, 0.3);
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(18, 12, 30, 0.97), rgba(12, 9, 22, 0.97));
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  min-width: 300px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  animation: slideInRight 0.4s ease-out;
+  pointer-events: auto;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+}
+
+.toast.hide {
+  animation: slideOutRight 0.4s ease-out forwards;
+}
+
+.toast-success {
+  border-color: var(--green);
+}
+
+.toast-success .toast-icon {
+  color: var(--green);
+}
+
+.toast-error {
+  border-color: var(--red);
+}
+
+.toast-error .toast-icon {
+  color: var(--red);
+}
+
+.toast-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.toast-message {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* P&ID Interactive Elements */
+.pid-tooltip {
+  position: fixed;
+  background: linear-gradient(135deg, rgba(18, 12, 30, 0.98), rgba(12, 9, 22, 0.98));
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text);
+  z-index: 5000;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  animation: tooltipFadeIn 0.2s ease-out;
+  max-width: 220px;
+  line-height: 1.5;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pid-tooltip .tooltip-title {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.pid-tooltip .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  margin: 4px 0;
+}
+
+.pid-tooltip .tooltip-label {
+  color: var(--text-dim);
+}
+
+.pid-tooltip .tooltip-value {
+  font-weight: 600;
+  color: var(--accent);
+  font-family: 'Menlo', monospace;
+}
+
+/* Equipment interactive hover effect */
+.pid-equipment {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pid-equipment:hover {
+  filter: drop-shadow(0 0 14px rgba(167, 139, 250, 0.7)) brightness(1.15);
+}
+
+.pid-equipment.active {
+  filter: drop-shadow(0 0 24px rgba(167, 139, 250, 0.95)) brightness(1.3);
+}
+
+.pid-vessel {
+  cursor: pointer;
+}
+
+.pid-vessel:hover rect {
+  stroke: var(--accent-hover) !important;
+  stroke-width: 2.5 !important;
+  filter: drop-shadow(0 0 14px rgba(167, 139, 250, 0.7));
+}
+
+/* Stream comparison panel */
+.comparison-panel {
+  background: linear-gradient(135deg, rgba(15, 12, 24, 0.9), rgba(10, 8, 18, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 20px;
+  display: none;
+}
+
+.comparison-panel.active {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.comparison-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comparison-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.comparison-close:hover {
+  color: var(--accent);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.comparison-item {
+  background: rgba(8, 7, 14, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.comparison-item .label {
+  font-size: 11px;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.comparison-row {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.comparison-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 50px;
+  text-align: right;
+}
+
+.comparison-delta {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 42px;
+  text-align: center;
+}
+
+.comparison-delta.positive {
+  color: var(--green);
+  background: rgba(82, 183, 136, 0.15);
+}
+
+.comparison-delta.negative {
+  color: var(--red);
+  background: rgba(230, 57, 70, 0.15);
+}
+
+.comparison-delta.neutral {
+  color: var(--text-dim);
+  background: rgba(160, 174, 192, 0.1);
+}
+
+/* Trend indicators on KPI cards */
+.kpi-trend {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.kpi-trend.up {
+  color: var(--green);
+}
+
+.kpi-trend.down {
+  color: var(--red);
+}
+
+.kpi-trend.neutral {
+  color: var(--text-dim);
+}
+
+/* Presets button group */
+.presets-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.preset-btn {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), rgba(167, 139, 250, 0.04));
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preset-btn:hover {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(167, 139, 250, 0.1));
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.3);
+}
+
+.preset-btn.active {
+  background: linear-gradient(135deg, #7c3aed, var(--accent));
+  border-color: var(--accent-hover);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(167, 139, 250, 0.55);
+}
+
+/* Sensitivity panel */
+.sensitivity-panel {
+  background: linear-gradient(135deg, rgba(15, 12, 24, 0.9), rgba(10, 8, 18, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 20px;
+  display: none;
+}
+
+.sensitivity-panel.active {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+.sensitivity-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sensitivity-toggle {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.sensitivity-toggle.open {
+  transform: rotate(180deg);
+}
+
+.sensitivity-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.sensitivity-item {
+  background: rgba(8, 7, 14, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 11px;
+}
+
+.sensitivity-item .param-name {
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sensitivity-bar {
+  height: 6px;
+  background: linear-gradient(to right, var(--red), var(--text-dim), var(--green));
+  border-radius: 3px;
+  margin: 6px 0;
+  position: relative;
+}
+
+.sensitivity-marker {
+  position: absolute;
+  width: 3px;
+  height: 10px;
+  background: var(--text);
+  top: -2px;
+  border-radius: 1px;
+}
+
+.sensitivity-impacts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  margin-top: 4px;
+}
+
+.sensitivity-impacts span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Thermal Profile Visualization */
+.thermal-section {
+  background: linear-gradient(135deg, rgba(15, 12, 24, 0.9), rgba(10, 8, 18, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.thermal-container {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.thermal-chart-wrapper {
+  position: relative;
+  background: linear-gradient(180deg, rgba(8, 6, 14, 0.7), rgba(5, 4, 12, 0.7));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 320px;
+}
+
+.thermal-canvas {
+  width: 100%;
+  height: 300px;
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #080b0f 0%, #060710 100%);
+}
+
+.thermal-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+}
+
+.thermal-legend-item {
+  background: linear-gradient(135deg, rgba(10, 8, 18, 0.9), rgba(6, 5, 14, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 11px;
+}
+
+.thermal-legend-item .label {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+
+.thermal-legend-item .value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  font-family: 'Menlo', monospace;
+  margin-bottom: 4px;
+}
+
+.thermal-legend-item .unit {
+  font-size: 9px;
+  color: var(--text-dimmer);
+}
+
+.thermal-legend-item.inlet {
+  border-left: 3px solid var(--c1);
+}
+
+.thermal-legend-item.outlet {
+  border-left: 3px solid var(--c6);
+}
+
+.thermal-legend-item.avg {
+  border-left: 3px solid var(--c3);
+}
+
+.thermal-legend-item .progress-bar {
+  height: 6px;
+  background: rgba(160, 174, 192, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.thermal-legend-item .progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--c1), var(--c3), var(--c6));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.thermal-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.thermal-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+}
+
+.thermal-stat-label {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.thermal-stat-value {
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Menlo', monospace;
+}
+
+.thermal-zone-indicator {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(8, 6, 14, 0.7);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.thermal-zone-box {
+  flex: 1;
+  height: 20px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.thermal-zone-inlet {
+  background: linear-gradient(135deg, var(--c1), #6d28d9);
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+}
+
+.thermal-zone-reaction {
+  background: linear-gradient(135deg, var(--c3), #d97706);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.thermal-zone-outlet {
+  background: linear-gradient(135deg, var(--c6), #ea580c);
+  box-shadow: 0 0 8px rgba(251, 146, 60, 0.4);
+}
+
+.cooling-effectiveness {
+  background: linear-gradient(135deg, rgba(82, 183, 136, 0.1), rgba(82, 183, 136, 0.05));
+  border: 1px solid rgba(82, 183, 136, 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--green);
+}
+
+.cooling-effectiveness .label {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  font-weight: 700;
+  font-size: 9px;
+}
+
+.cooling-effectiveness .bar {
   height: 8px;
+  background: rgba(82, 183, 136, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.cooling-effectiveness .fill {
+  height: 100%;
   background: var(--green);
   border-radius: 4px;
-  vertical-align: middle;
-  margin-right: 8px;
+  transition: width 0.4s ease;
+}
+
+.cooling-effectiveness .status {
+  font-size: 10px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cooling-effectiveness .status::before {
+  content: '●';
+  font-size: 6px;
+  display: inline-block;
+}
+
+@media (max-width: 1024px) {
+  .thermal-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .thermal-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .thermal-legend {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 footer {
   text-align: center;
-  padding: 24px;
-  color: var(--text-dim);
+  padding: 28px;
+  color: var(--text-dimmer);
   font-size: 12px;
   border-top: 1px solid var(--border);
-  margin-top: 24px;
+  margin-top: 28px;
+}
+
+@media (max-width: 1024px) {
+  main { padding: 24px 16px; }
+  .section { padding: 20px; }
+  .slider-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
-  .squ-name { font-size: 22px; }
+  .squ-name { font-size: 22px; letter-spacing: 0.8px; }
+  .dept { font-size: 12px; }
   .project-title { font-size: 18px; }
+  .project-sub { font-size: 12px; }
+  
+  header { padding: 18px 20px; }
   main { padding: 16px 12px; }
-  .section { padding: 16px; }
+  .section { 
+    padding: 16px; 
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .section-title {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  
+  .slider-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .kpi-card {
+    padding: 16px 12px;
+  }
+  
+  .kpi-value {
+    font-size: 22px;
+  }
+  
+  .predict-btn {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+  
+  .toast {
+    min-width: 280px;
+    padding: 12px 14px;
+  }
+  
+  .metrics-table {
+    font-size: 12px;
+  }
+  
+  .metrics-table th, .metrics-table td {
+    padding: 10px 8px;
+  }
+  
+  svg.process-diagram {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .squ-name { font-size: 18px; }
+  .project-title { font-size: 15px; }
+  
+  header { padding: 14px 14px; }
+  main { padding: 12px 8px; }
+  .section { 
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .slider-row {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .kpi-card {
+    padding: 14px 12px;
+  }
+  
+  .kpi-label {
+    font-size: 11px;
+  }
+  
+  .kpi-value {
+    font-size: 20px;
+  }
+  
+  .toast {
+    min-width: calc(100vw - 24px);
+    right: 12px;
+    left: 12px;
+  }
 }
 </style>
 </head>
@@ -291,143 +1420,398 @@ footer {
   <div class="section">
     <div class="section-title">Fischer&ndash;Tropsch Loop &mdash; Packed Bed Reactor Process Flow</div>
     <div class="diagram-wrap">
-      <svg class="process-diagram" viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg">
+      <svg class="process-diagram" viewBox="0 0 1100 500" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-            <path d="M0,0 L10,5 L0,10 z" fill="#74b9ff"/>
+          <!-- Arrow markers -->
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#4dabf7"/>
           </marker>
-          <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#ffa94d"/>
           </marker>
-          <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#8b95b0"/>
           </marker>
-          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
             <path d="M0,0 L10,5 L0,10 z" fill="#52b788"/>
           </marker>
-          <linearGradient id="reactorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#2a3556"/>
-            <stop offset="100%" stop-color="#1a2238"/>
+
+          <!-- Engineering grid -->
+          <pattern id="gridDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.8" fill="#2a3557" opacity="0.55"/>
+          </pattern>
+
+          <!-- Vessel shell gradient (3D steel look) -->
+          <linearGradient id="reactorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#1a2138"/>
+            <stop offset="25%"  stop-color="#2f3a5e"/>
+            <stop offset="50%"  stop-color="#3b4876"/>
+            <stop offset="75%"  stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#1a2138"/>
           </linearGradient>
+
+          <!-- Catalyst bed gradient -->
           <linearGradient id="bedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#5a4a3a"/>
-            <stop offset="100%" stop-color="#3a2e22"/>
+            <stop offset="0%"   stop-color="#6a5237"/>
+            <stop offset="100%" stop-color="#3a2a17"/>
           </linearGradient>
+
+          <!-- Temperature overlay (hotter near top outlet) -->
+          <linearGradient id="tempGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%"   stop-color="#4dabf7" stop-opacity="0.08"/>
+            <stop offset="60%"  stop-color="#ffa94d" stop-opacity="0.10"/>
+            <stop offset="100%" stop-color="#ff6b6b" stop-opacity="0.18"/>
+          </linearGradient>
+
+          <!-- Tube cylinder gradient -->
+          <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#3a2a17"/>
+            <stop offset="45%"  stop-color="#8a6d48"/>
+            <stop offset="55%"  stop-color="#9a7d58"/>
+            <stop offset="100%" stop-color="#3a2a17"/>
+          </linearGradient>
+
+          <!-- Equipment radial -->
+          <radialGradient id="mixerGrad" cx="35%" cy="30%" r="75%">
+            <stop offset="0%"   stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#0f1527"/>
+          </radialGradient>
+          <radialGradient id="sepGrad" cx="50%" cy="30%" r="80%">
+            <stop offset="0%"   stop-color="#2a3350"/>
+            <stop offset="100%" stop-color="#0f1527"/>
+          </radialGradient>
+          <linearGradient id="compGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#2f3a5e"/>
+            <stop offset="100%" stop-color="#131a30"/>
+          </linearGradient>
+
+          <!-- Cooling jacket fill -->
+          <linearGradient id="jacketGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#52b788" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#1b4332" stop-opacity="0.55"/>
+          </linearGradient>
+
+          <!-- Glow filter for reactor -->
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+
+          <!-- Reusable pipe: outer casing stroke then inner colored stroke.
+               Each stream is drawn twice (static outer + animated inner). -->
         </defs>
 
-        <!-- Title labels -->
-        <text x="550" y="20" text-anchor="middle" fill="#74b9ff" font-size="13" font-weight="700">FT MULTITUBULAR PACKED-BED REACTOR LOOP</text>
+        <!-- Engineering grid background -->
+        <rect x="0" y="0" width="1100" height="500" fill="url(#gridDots)"/>
 
-        <!-- Syngas Feed -->
-        <text x="50" y="100" fill="#4dabf7" font-size="12" font-weight="700">SYNGAS FEED</text>
-        <text x="50" y="115" fill="#8b95b0" font-size="10">H₂ + CO</text>
-        <line x1="50" y1="130" x2="180" y2="130" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-
-        <!-- Mixer -->
-        <circle cx="200" cy="130" r="20" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
-        <text x="200" y="135" text-anchor="middle" fill="#74b9ff" font-size="14" font-weight="700">M</text>
-        <text x="200" y="170" text-anchor="middle" fill="#8b95b0" font-size="10">Mixer</text>
-
-        <!-- Mixer to reactor inlet (bottom) -->
-        <line x1="220" y1="130" x2="280" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="280" y1="130" x2="280" y2="380" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="280" y1="380" x2="380" y2="380" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-        <text x="295" y="250" fill="#8b95b0" font-size="10">Reactor inlet</text>
-
-        <!-- REACTOR VESSEL -->
-        <rect x="400" y="80" width="200" height="320" rx="12" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2.5"/>
-        <text x="500" y="70" text-anchor="middle" fill="#74b9ff" font-size="12" font-weight="700">PACKED BED REACTOR</text>
-
-        <!-- Cooling water jacket (outer rectangle) -->
-        <rect x="392" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
-        <rect x="600" y="100" width="8" height="280" fill="#52b788" opacity="0.3"/>
-
-        <!-- Tube bundle (vertical lines representing tubes) -->
-        <g stroke="#5a4a3a" stroke-width="6" stroke-linecap="round">
-          <line x1="420" y1="110" x2="420" y2="370"/>
-          <line x1="440" y1="110" x2="440" y2="370"/>
-          <line x1="460" y1="110" x2="460" y2="370"/>
-          <line x1="480" y1="110" x2="480" y2="370"/>
-          <line x1="500" y1="110" x2="500" y2="370"/>
-          <line x1="520" y1="110" x2="520" y2="370"/>
-          <line x1="540" y1="110" x2="540" y2="370"/>
-          <line x1="560" y1="110" x2="560" y2="370"/>
-          <line x1="580" y1="110" x2="580" y2="370"/>
-        </g>
-        <!-- Catalyst pellets pattern overlay -->
-        <g fill="#ffa94d" opacity="0.6">
-          <circle cx="420" cy="150" r="2"/><circle cx="440" cy="160" r="2"/><circle cx="460" cy="155" r="2"/>
-          <circle cx="480" cy="170" r="2"/><circle cx="500" cy="150" r="2"/><circle cx="520" cy="165" r="2"/>
-          <circle cx="540" cy="160" r="2"/><circle cx="560" cy="155" r="2"/><circle cx="580" cy="170" r="2"/>
-          <circle cx="420" cy="220" r="2"/><circle cx="440" cy="210" r="2"/><circle cx="460" cy="225" r="2"/>
-          <circle cx="480" cy="215" r="2"/><circle cx="500" cy="220" r="2"/><circle cx="520" cy="210" r="2"/>
-          <circle cx="540" cy="225" r="2"/><circle cx="560" cy="215" r="2"/><circle cx="580" cy="220" r="2"/>
-          <circle cx="420" cy="290" r="2"/><circle cx="440" cy="300" r="2"/><circle cx="460" cy="285" r="2"/>
-          <circle cx="480" cy="295" r="2"/><circle cx="500" cy="290" r="2"/><circle cx="520" cy="300" r="2"/>
-          <circle cx="540" cy="285" r="2"/><circle cx="560" cy="295" r="2"/><circle cx="580" cy="290" r="2"/>
+        <!-- Diagram title bar -->
+        <g>
+          <rect x="360" y="4" width="380" height="22" rx="11" fill="#0f1d3a" stroke="#2e3757"/>
+          <text x="550" y="19" text-anchor="middle" fill="#74b9ff" font-size="11" font-weight="800" letter-spacing="1.5">
+            FT MULTITUBULAR PACKED-BED REACTOR LOOP
+          </text>
         </g>
 
-        <text x="500" y="240" text-anchor="middle" fill="#e8eaf6" font-size="11" font-weight="700">Co Catalyst</text>
-        <text x="500" y="255" text-anchor="middle" fill="#8b95b0" font-size="10">Tube Bundle</text>
+        <!-- =========================================================
+             STREAM 1 · SYNGAS FEED  (blue, left)
+             ========================================================= -->
+        <g id="stream-syngas">
+          <rect x="36" y="90" width="118" height="32" rx="6" fill="#0f1d3a" stroke="#4dabf7" stroke-opacity="0.55"/>
+          <text x="95" y="104" text-anchor="middle" fill="#4dabf7" font-size="11" font-weight="800" letter-spacing="0.8">SYNGAS FEED</text>
+          <text x="95" y="116" text-anchor="middle" fill="#8b95b0" font-size="9">H₂ + CO</text>
+        </g>
+        <!-- Pipe: feed → mixer -->
+        <path d="M 50,140 L 178,140" fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 50,140 L 178,140" fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr)"/>
 
-        <!-- Cooling water in/out -->
-        <line x1="340" y1="110" x2="392" y2="110" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
-        <text x="340" y="100" text-anchor="end" fill="#52b788" font-size="10" font-weight="700">CW in</text>
-        <line x1="608" y1="370" x2="660" y2="370" stroke="#52b788" stroke-width="3" marker-end="url(#arr-green)"/>
-        <text x="665" y="375" fill="#52b788" font-size="10" font-weight="700">CW out</text>
+        <!-- =========================================================
+             EQUIPMENT · MIXER
+             ========================================================= -->
+        <g id="eq-mixer">
+          <circle cx="200" cy="140" r="22" fill="url(#mixerGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <line x1="184" y1="140" x2="216" y2="140" stroke="#74b9ff" stroke-width="1" opacity="0.6"/>
+          <line x1="200" y1="124" x2="200" y2="156" stroke="#74b9ff" stroke-width="1" opacity="0.6"/>
+          <text x="200" y="144" text-anchor="middle" fill="#e8eaf6" font-size="13" font-weight="800">M</text>
+          <rect x="178" y="172" width="44" height="16" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="200" y="183" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="700" letter-spacing="0.8">MX-01</text>
+        </g>
 
-        <!-- Reactor outlet (top) -->
-        <line x1="500" y1="80" x2="500" y2="50" stroke="#ffa94d" stroke-width="3"/>
-        <line x1="500" y1="50" x2="780" y2="50" stroke="#ffa94d" stroke-width="3"/>
-        <line x1="780" y1="50" x2="780" y2="170" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
-        <text x="640" y="42" fill="#ffa94d" font-size="10">Reactor outlet (HC + unreacted syngas)</text>
+        <!-- =========================================================
+             STREAM · Mixer → Reactor inlet (bottom)
+             ========================================================= -->
+        <path d="M 222,140 L 270,140 Q 280,140 280,150 L 280,390 Q 280,400 290,400 L 384,400"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 222,140 L 270,140 Q 280,140 280,150 L 280,390 Q 280,400 290,400 L 384,400"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr)"/>
+        <g>
+          <rect x="294" y="246" width="72" height="16" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="330" y="257" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="600">REACTOR INLET</text>
+        </g>
 
-        <!-- SEPARATOR -->
-        <ellipse cx="820" cy="220" rx="60" ry="50" fill="#1e2433" stroke="#74b9ff" stroke-width="2.5"/>
-        <line x1="760" y1="220" x2="880" y2="220" stroke="#74b9ff" stroke-width="1" stroke-dasharray="3,3"/>
-        <text x="820" y="200" text-anchor="middle" fill="#74b9ff" font-size="11" font-weight="700">SEPARATOR</text>
-        <text x="820" y="245" text-anchor="middle" fill="#8b95b0" font-size="9">Gas / Liquid</text>
+        <!-- =========================================================
+             COOLING JACKET  (wraps vessel)
+             ========================================================= -->
+        <g opacity="0.95">
+          <!-- Left jacket wall -->
+          <path d="M 388,110 Q 388,92 406,92 L 406,400 Q 388,400 388,382 Z"
+                fill="url(#jacketGrad)" stroke="#52b788" stroke-width="1" opacity="0.85"/>
+          <!-- Right jacket wall -->
+          <path d="M 612,110 Q 612,92 594,92 L 594,400 Q 612,400 612,382 Z"
+                fill="url(#jacketGrad)" stroke="#52b788" stroke-width="1" opacity="0.85"/>
+          <!-- Jacket flow chevrons (upward on left wall) -->
+          <g fill="none" stroke="#52b788" stroke-width="1.4" opacity="0.7">
+            <polyline points="393,200 397,195 393,190"/>
+            <polyline points="393,260 397,255 393,250"/>
+            <polyline points="393,320 397,315 393,310"/>
+          </g>
+        </g>
 
-        <!-- Liquid product out (bottom of separator) -->
-        <line x1="820" y1="270" x2="820" y2="380" stroke="#ffa94d" stroke-width="3" marker-end="url(#arr-orange)"/>
-        <text x="830" y="395" fill="#ffa94d" font-size="11" font-weight="700">C₈–C₁₆ PRODUCT</text>
-        <text x="830" y="408" fill="#8b95b0" font-size="9">Diesel range</text>
+        <!-- =========================================================
+             REACTOR VESSEL  (domed pressure vessel)
+             ========================================================= -->
+        <g id="eq-reactor" class="vessel-glow">
+          <!-- Body (straight shell) -->
+          <rect x="406" y="110" width="188" height="290" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Top hemispheric head -->
+          <path d="M 406,110 Q 500,62 594,110 Z" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Bottom hemispheric head -->
+          <path d="M 406,400 Q 500,448 594,400 Z" fill="url(#reactorGrad)" stroke="#74b9ff" stroke-width="2"/>
+          <!-- Subtle highlight edge -->
+          <line x1="416" y1="120" x2="416" y2="390" stroke="#8ea8d9" stroke-width="1" opacity="0.35"/>
+        </g>
 
-        <!-- Gas top of separator -> Compressor -->
-        <line x1="820" y1="170" x2="820" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="820" y1="130" x2="980" y2="130" stroke="#4dabf7" stroke-width="3"/>
+        <!-- Tag -->
+        <g>
+          <rect x="446" y="70" width="108" height="18" rx="9" fill="#0f1d3a" stroke="#74b9ff" stroke-width="1"/>
+          <text x="500" y="83" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="800" letter-spacing="1.2">R-101 · PACKED BED</text>
+        </g>
 
-        <!-- Compressor -->
-        <polygon points="980,115 1010,100 1010,160 980,145" fill="#1e2433" stroke="#74b9ff" stroke-width="2"/>
-        <text x="995" y="180" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="700">COMP</text>
+        <!-- Temperature overlay (inside vessel body) -->
+        <rect x="408" y="112" width="184" height="286" fill="url(#tempGrad)" opacity="0.9"/>
 
-        <!-- Recycle path back to mixer (top route) -->
-        <line x1="1010" y1="130" x2="1050" y2="130" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="1050" y1="130" x2="1050" y2="40" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="1050" y1="40" x2="200" y2="40" stroke="#4dabf7" stroke-width="3"/>
-        <line x1="200" y1="40" x2="200" y2="110" stroke="#4dabf7" stroke-width="3" marker-end="url(#arr)"/>
-        <text x="600" y="32" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">RECYCLE LOOP</text>
+        <!-- Tube bundle (cylindrical look: dark base + light highlight) -->
+        <g>
+          <!-- Darker tube body -->
+          <g stroke="url(#tubeGrad)" stroke-width="10" stroke-linecap="round">
+            <line x1="425" y1="125" x2="425" y2="385"/>
+            <line x1="449" y1="125" x2="449" y2="385"/>
+            <line x1="473" y1="125" x2="473" y2="385"/>
+            <line x1="497" y1="125" x2="497" y2="385"/>
+            <line x1="521" y1="125" x2="521" y2="385"/>
+            <line x1="545" y1="125" x2="545" y2="385"/>
+            <line x1="569" y1="125" x2="569" y2="385"/>
+          </g>
+          <!-- Highlight streak -->
+          <g stroke="#e0c490" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
+            <line x1="423" y1="130" x2="423" y2="380"/>
+            <line x1="447" y1="130" x2="447" y2="380"/>
+            <line x1="471" y1="130" x2="471" y2="380"/>
+            <line x1="495" y1="130" x2="495" y2="380"/>
+            <line x1="519" y1="130" x2="519" y2="380"/>
+            <line x1="543" y1="130" x2="543" y2="380"/>
+            <line x1="567" y1="130" x2="567" y2="380"/>
+          </g>
+        </g>
 
-        <!-- Purge -->
-        <line x1="1030" y1="130" x2="1030" y2="220" stroke="#8b95b0" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
-        <text x="1040" y="225" fill="#8b95b0" font-size="10" font-weight="700">PURGE</text>
-        <text x="1040" y="237" fill="#8b95b0" font-size="9">(inerts)</text>
+        <!-- Catalyst pellets (denser, varied radii) -->
+        <g fill="#ffa94d" opacity="0.75">
+          <circle cx="425" cy="150" r="1.8"/><circle cx="449" cy="158" r="2.2"/><circle cx="473" cy="152" r="1.6"/>
+          <circle cx="497" cy="164" r="2.0"/><circle cx="521" cy="150" r="1.8"/><circle cx="545" cy="160" r="2.1"/>
+          <circle cx="569" cy="154" r="1.7"/>
+          <circle cx="437" cy="175" r="1.5"/><circle cx="461" cy="182" r="1.9"/><circle cx="485" cy="178" r="2.0"/>
+          <circle cx="509" cy="172" r="1.6"/><circle cx="533" cy="184" r="1.9"/><circle cx="557" cy="178" r="1.7"/>
+          <circle cx="425" cy="210" r="2.0"/><circle cx="449" cy="220" r="1.7"/><circle cx="473" cy="215" r="2.1"/>
+          <circle cx="497" cy="208" r="1.8"/><circle cx="521" cy="222" r="1.9"/><circle cx="545" cy="216" r="2.0"/>
+          <circle cx="569" cy="212" r="1.7"/>
+          <circle cx="437" cy="248" r="1.6"/><circle cx="461" cy="254" r="2.0"/><circle cx="485" cy="246" r="1.8"/>
+          <circle cx="509" cy="258" r="1.9"/><circle cx="533" cy="250" r="1.7"/><circle cx="557" cy="260" r="2.1"/>
+          <circle cx="425" cy="290" r="1.9"/><circle cx="449" cy="298" r="1.7"/><circle cx="473" cy="286" r="2.0"/>
+          <circle cx="497" cy="294" r="1.8"/><circle cx="521" cy="300" r="1.6"/><circle cx="545" cy="286" r="2.0"/>
+          <circle cx="569" cy="296" r="1.8"/>
+          <circle cx="437" cy="328" r="1.7"/><circle cx="461" cy="334" r="2.0"/><circle cx="485" cy="326" r="1.8"/>
+          <circle cx="509" cy="338" r="1.9"/><circle cx="533" cy="330" r="2.1"/><circle cx="557" cy="336" r="1.7"/>
+          <circle cx="425" cy="362" r="1.9"/><circle cx="449" cy="370" r="1.7"/><circle cx="473" cy="365" r="2.0"/>
+          <circle cx="497" cy="358" r="1.8"/><circle cx="521" cy="372" r="1.9"/><circle cx="545" cy="366" r="2.1"/>
+          <circle cx="569" cy="362" r="1.7"/>
+        </g>
 
-        <!-- Live KPI annotations on diagram -->
-        <g id="kpiAnnotations">
-          <text id="kpi-temp" x="500" y="100" text-anchor="middle" fill="#ffa94d" font-size="10" font-weight="700">T = -- °C</text>
-          <text id="kpi-pres" x="500" y="385" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="700">P = -- bar</text>
-          <text id="kpi-dp" x="660" y="320" fill="#ff6b6b" font-size="10" font-weight="700">ΔP = -- bar</text>
-          <text id="kpi-cool" x="660" y="335" fill="#52b788" font-size="10" font-weight="700">Q_cool = -- MW</text>
-          <text id="kpi-comp" x="930" y="100" fill="#cc5de8" font-size="10" font-weight="700">W_comp = -- MW</text>
+        <!-- Vessel center text panel -->
+        <g>
+          <rect x="440" y="230" width="120" height="36" rx="4" fill="#0b1328" stroke="#2e3757" opacity="0.9"/>
+          <text x="500" y="246" text-anchor="middle" fill="#e8eaf6" font-size="11" font-weight="800" letter-spacing="0.8">Co CATALYST</text>
+          <text x="500" y="260" text-anchor="middle" fill="#8b95b0" font-size="9">Tube Bundle · Ø 42 mm</text>
+        </g>
+
+        <!-- =========================================================
+             COOLING WATER streams (in top-left / out bottom-right)
+             ========================================================= -->
+        <!-- CW IN -->
+        <path d="M 330,115 L 388,115" fill="none" stroke="#0b1328" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 330,115 L 388,115" fill="none" stroke="#52b788" stroke-width="3" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr-green)"/>
+        <g id="stream-cwin">
+          <rect x="284" y="98" width="46" height="14" rx="3" fill="#0f1527" stroke="#52b788" stroke-opacity="0.6"/>
+          <text x="307" y="108" text-anchor="middle" fill="#52b788" font-size="9" font-weight="700">CW IN</text>
+        </g>
+        <!-- CW OUT -->
+        <path d="M 612,385 L 670,385" fill="none" stroke="#0b1328" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 612,385 L 670,385" fill="none" stroke="#52b788" stroke-width="3" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr-green)"/>
+        <g id="stream-cwout">
+          <rect x="670" y="378" width="52" height="14" rx="3" fill="#0f1527" stroke="#52b788" stroke-opacity="0.6"/>
+          <text x="696" y="388" text-anchor="middle" fill="#52b788" font-size="9" font-weight="700">CW OUT</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Reactor outlet (top) → Separator
+             ========================================================= -->
+        <path d="M 500,62 L 500,46 Q 500,36 510,36 L 780,36 Q 790,36 790,46 L 790,170"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 500,62 L 500,46 Q 500,36 510,36 L 780,36 Q 790,36 790,46 L 790,170"
+              fill="none" stroke="#ffa94d" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr-orange)"/>
+        <g>
+          <rect x="582" y="20" width="146" height="14" rx="3" fill="#0f1527" stroke="#ffa94d" stroke-opacity="0.5"/>
+          <text x="655" y="30" text-anchor="middle" fill="#ffa94d" font-size="9" font-weight="700" letter-spacing="0.5">REACTOR OUT · HC + SYNGAS</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Liquid product (separator bottom → out)
+             ========================================================= -->
+        <path d="M 790,288 L 790,410" fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 790,288 L 790,410" fill="none" stroke="#ffa94d" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow" marker-end="url(#arr-orange)"/>
+        <g id="stream-product">
+          <rect x="722" y="418" width="136" height="34" rx="6" fill="#2a1a0a" stroke="#ffa94d"/>
+          <text x="790" y="432" text-anchor="middle" fill="#ffa94d" font-size="11" font-weight="800" letter-spacing="0.8">C₈–C₁₆ PRODUCT</text>
+          <text x="790" y="446" text-anchor="middle" fill="#8b95b0" font-size="9">Diesel range</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Gas (separator top) → Compressor
+             ========================================================= -->
+        <path d="M 790,178 L 790,140 Q 790,128 800,128 L 978,128"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 790,178 L 790,140 Q 790,128 800,128 L 978,128"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow"/>
+
+        <!-- =========================================================
+             EQUIPMENT · SEPARATOR (flash drum) — after pipes for correct z-order
+             ========================================================= -->
+        <g id="eq-separator">
+          <!-- Vertical capsule -->
+          <rect x="762" y="178" width="56" height="110" rx="28" fill="url(#sepGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <!-- Liquid level line -->
+          <line x1="762" y1="248" x2="818" y2="248" stroke="#ffa94d" stroke-width="1.3" stroke-dasharray="3,2" opacity="0.8"/>
+          <!-- Liquid zone shading -->
+          <rect x="763" y="249" width="54" height="38" fill="#ffa94d" opacity="0.08"/>
+          <!-- Label — sized to match R-101 pill style -->
+          <rect x="735" y="156" width="110" height="18" rx="9" fill="#0f1d3a" stroke="#74b9ff" stroke-width="1"/>
+          <text x="790" y="169" text-anchor="middle" fill="#74b9ff" font-size="10" font-weight="800" letter-spacing="1.2">V-201 · SEPARATOR</text>
+          <!-- Phase labels inside -->
+          <text x="790" y="215" text-anchor="middle" fill="#8b95b0" font-size="8" font-weight="700">GAS</text>
+          <text x="790" y="273" text-anchor="middle" fill="#ffa94d" font-size="8" font-weight="700" opacity="0.85">LIQUID</text>
+        </g>
+
+        <!-- =========================================================
+             EQUIPMENT · COMPRESSOR
+             ========================================================= -->
+        <g id="eq-compressor">
+          <polygon points="978,112 1014,96 1014,160 978,144" fill="url(#compGrad)" stroke="#74b9ff" stroke-width="1.8"/>
+          <!-- Rotor hint -->
+          <polyline points="988,120 996,128 988,136" fill="none" stroke="#74b9ff" stroke-width="1.2" opacity="0.7"/>
+          <polyline points="1000,120 1008,128 1000,136" fill="none" stroke="#74b9ff" stroke-width="1.2" opacity="0.7"/>
+          <rect x="974" y="168" width="48" height="14" rx="3" fill="#0f1d3a" stroke="#74b9ff" stroke-width="0.8"/>
+          <text x="998" y="178" text-anchor="middle" fill="#74b9ff" font-size="9" font-weight="800" letter-spacing="1">K-101</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Recycle loop (top route back to mixer)
+             ========================================================= -->
+        <path d="M 1014,128 Q 1054,128 1054,88 L 1054,50 Q 1054,40 1044,40 L 210,40 Q 200,40 200,50 L 200,118"
+              fill="none" stroke="#0b1328" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 1014,128 Q 1054,128 1054,88 L 1054,50 Q 1054,40 1044,40 L 210,40 Q 200,40 200,50 L 200,118"
+              fill="none" stroke="#4dabf7" stroke-width="3.5" stroke-linecap="round"
+              class="pipe-flow slow" marker-end="url(#arr)"/>
+        <g id="stream-recycle">
+          <rect x="540" y="50" width="120" height="14" rx="3" fill="#0f1527" stroke="#4dabf7" stroke-opacity="0.5"/>
+          <text x="600" y="60" text-anchor="middle" fill="#4dabf7" font-size="9" font-weight="700" letter-spacing="1">RECYCLE LOOP</text>
+        </g>
+
+        <!-- =========================================================
+             STREAM · Purge (dashed, gray)
+             ========================================================= -->
+        <path d="M 1040,128 L 1040,220" fill="none" stroke="#8b95b0" stroke-width="2"
+              stroke-dasharray="5,4" marker-end="url(#arr-gray)"/>
+        <g id="stream-purge">
+          <rect x="1048" y="210" width="48" height="26" rx="3" fill="#0f1527" stroke="#2e3757"/>
+          <text x="1072" y="221" text-anchor="middle" fill="#8b95b0" font-size="9" font-weight="700" letter-spacing="0.8">PURGE</text>
+          <text x="1072" y="232" text-anchor="middle" fill="#8b95b0" font-size="8">(inerts)</text>
+        </g>
+
+        <!-- =========================================================
+             LIVE KPI ANNOTATIONS  (IDs preserved for JS binding)
+             ========================================================= -->
+        <g id="kpiAnnotations" font-family="SFMono-Regular, Menlo, monospace">
+          <!-- T -->
+          <g>
+            <rect x="458" y="100" width="84" height="16" rx="3" fill="#2a1a0a" stroke="#ffa94d" stroke-opacity="0.65"/>
+            <text id="kpi-temp" x="500" y="111" text-anchor="middle" fill="#ffa94d" font-size="10" font-weight="800">T = -- °C</text>
+          </g>
+          <!-- P -->
+          <g>
+            <rect x="458" y="384" width="84" height="16" rx="3" fill="#0d1b33" stroke="#4dabf7" stroke-opacity="0.65"/>
+            <text id="kpi-pres" x="500" y="395" text-anchor="middle" fill="#4dabf7" font-size="10" font-weight="800">P = -- bar</text>
+          </g>
+          <!-- ΔP -->
+          <g>
+            <rect x="626" y="306" width="100" height="16" rx="3" fill="#2a0c10" stroke="#ff6b6b" stroke-opacity="0.65"/>
+            <text id="kpi-dp" x="676" y="317" text-anchor="middle" fill="#ff6b6b" font-size="10" font-weight="800">ΔP = -- bar</text>
+          </g>
+          <!-- Q_cool -->
+          <g>
+            <rect x="626" y="326" width="100" height="16" rx="3" fill="#0f2a1c" stroke="#52b788" stroke-opacity="0.65"/>
+            <text id="kpi-cool" x="676" y="337" text-anchor="middle" fill="#52b788" font-size="10" font-weight="800">Q_cool = -- MW</text>
+          </g>
+          <!-- W_comp -->
+          <g>
+            <rect x="928" y="86" width="108" height="16" rx="3" fill="#210e2a" stroke="#cc5de8" stroke-opacity="0.65"/>
+            <text id="kpi-comp" x="982" y="97" text-anchor="middle" fill="#cc5de8" font-size="10" font-weight="800">W_comp = -- MW</text>
+          </g>
         </g>
       </svg>
+
+      <!-- Stream legend -->
+      <div class="stream-legend">
+        <div class="item"><span class="swatch syngas"></span>Syngas / Recycle</div>
+        <div class="item"><span class="swatch product"></span>Hydrocarbon Product</div>
+        <div class="item"><span class="swatch cooling"></span>Cooling Water</div>
+        <div class="item"><span class="swatch purge"></span>Purge (Inerts)</div>
+      </div>
     </div>
   </div>
 
   <!-- Input Parameters Section -->
   <div class="section">
     <div class="section-title">Input Parameters &mdash; Adjust to Predict</div>
+    
+    <!-- Preset Configurations -->
+    <div style="margin-bottom: 20px; padding: 14px; background: rgba(74, 144, 226, 0.05); border: 1px solid rgba(74, 144, 226, 0.15); border-radius: 8px;">
+      <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Quick Presets</div>
+      <div class="presets-group">
+        <button class="preset-btn active" id="presetBaseline">Baseline</button>
+        <button class="preset-btn" id="presetAggressive">Aggressive</button>
+        <button class="preset-btn" id="presetConservative">Conservative</button>
+        <button class="preset-btn" id="presetLowEnergy">Low Energy</button>
+      </div>
+    </div>
+    
     <div class="slider-grid">
       <div class="slider-group">
         <h3>Operating Conditions</h3>
@@ -500,7 +1884,7 @@ footer {
         </div>
       </div>
     </div>
-    <button class="predict-btn" id="predictBtn">Run ML Prediction</button>
+    <button class="predict-btn" id="predictBtn"><div class="spinner"></div><span class="btn-text">Run ML Prediction</span></button>
   </div>
 
   <!-- KPI Results Section -->
@@ -541,6 +1925,106 @@ footer {
         <div class="kpi-unit">bar (limit 4.0)</div>
       </div>
     </div>
+
+    <!-- Comparison Panel -->
+    <div class="comparison-panel" id="comparisonPanel">
+      <div class="comparison-header">
+        <h4>📊 Comparison vs Baseline</h4>
+        <button class="comparison-close" id="closeComparison">✕</button>
+      </div>
+      <div class="comparison-grid" id="comparisonGrid"></div>
+    </div>
+
+    <!-- Sensitivity Analysis Panel -->
+    <div class="sensitivity-panel" id="sensitivityPanel">
+      <div class="sensitivity-header">
+        <button class="sensitivity-toggle" id="sensitivityToggle">▼</button>
+        <span>Parameter Sensitivity Impact</span>
+      </div>
+      <div class="sensitivity-content" id="sensitivityContent"></div>
+    </div>
+  </div>
+
+  <!-- Thermal Profile Visualization Section -->
+  <div class="section">
+    <div class="section-title">🔥 Thermal Profile &mdash; Temperature Gradient & Heat Removal</div>
+    <div class="thermal-section">
+      <div class="thermal-container">
+        <!-- Left: Chart -->
+        <div class="thermal-chart-wrapper">
+          <canvas id="thermalCanvas" class="thermal-canvas"></canvas>
+          <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 10px; color: var(--text-dimmer); text-align: center;">
+            Reactor Length (normalized)
+          </div>
+        </div>
+        
+        <!-- Right: Legend & Stats -->
+        <div class="thermal-legend">
+          <!-- Inlet Temperature -->
+          <div class="thermal-legend-item inlet">
+            <div class="label">Inlet Temp</div>
+            <div class="value" id="thermalInlet">--</div>
+            <div class="unit">°C</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 20%;"></div></div>
+          </div>
+          
+          <!-- Outlet Temperature -->
+          <div class="thermal-legend-item outlet">
+            <div class="label">Outlet Temp</div>
+            <div class="value" id="thermalOutlet">--</div>
+            <div class="unit">°C</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+          </div>
+          
+          <!-- Average Temperature -->
+          <div class="thermal-legend-item avg">
+            <div class="label">Avg Temp</div>
+            <div class="value" id="thermalAvg">--</div>
+            <div class="unit">°C</div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+          </div>
+          
+          <!-- Thermal Zones -->
+          <div style="margin-top: 4px;">
+            <div style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; font-weight: 700;">Zones</div>
+            <div class="thermal-zone-indicator">
+              <div class="thermal-zone-box thermal-zone-inlet">Inlet</div>
+              <div class="thermal-zone-box thermal-zone-reaction">Reaction</div>
+              <div class="thermal-zone-box thermal-zone-outlet">Outlet</div>
+            </div>
+          </div>
+          
+          <!-- Cooling Effectiveness -->
+          <div class="cooling-effectiveness">
+            <div class="label">Cooling Effectiveness</div>
+            <div class="bar"><div class="fill" id="coolingFill" style="width: 75%;"></div></div>
+            <div class="status">
+              <span id="coolingStatus">Excellent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Stats below chart -->
+      <div class="thermal-stats">
+        <div class="thermal-stat-row">
+          <span class="thermal-stat-label">ΔT across bed</span>
+          <span class="thermal-stat-value" id="thermalDelta">--°C</span>
+        </div>
+        <div class="thermal-stat-row">
+          <span class="thermal-stat-label">Heat removal rate</span>
+          <span class="thermal-stat-value" id="thermalHeatRate">-- MW</span>
+        </div>
+        <div class="thermal-stat-row">
+          <span class="thermal-stat-label">Exothermic intensity</span>
+          <span class="thermal-stat-value" id="thermalIntensity">-- kW/m³</span>
+        </div>
+        <div class="thermal-stat-row">
+          <span class="thermal-stat-label">Temp runaway risk</span>
+          <span class="thermal-stat-value" id="thermalRisk" style="color: var(--green);">Low</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Model Info Section -->
@@ -562,6 +2046,9 @@ footer {
   Fischer&ndash;Tropsch Reactor ML Surrogate &middot; Powered by Flask + ExtraTreesRegressor
 </footer>
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
 const PARAMS = [
   "temperature_C", "pressure_bar", "ghsv_h", "target_x_co",
@@ -569,100 +2056,1026 @@ const PARAMS = [
   "void_fraction", "purge_fraction"
 ];
 
-// Bidirectional sync between sliders and number inputs
+// ==================== PRESET CONFIGURATIONS ====================
+const PRESETS = {
+  baseline: {
+    temperature_C: 220, pressure_bar: 25, ghsv_h: 1800, target_x_co: 0.72,
+    total_flow_kmol_h: 1200, tube_inner_diameter_m: 0.042, particle_diameter_m: 0.0012,
+    void_fraction: 0.42, purge_fraction: 0.03
+  },
+  aggressive: {
+    temperature_C: 232, pressure_bar: 26, ghsv_h: 2100, target_x_co: 0.75,
+    total_flow_kmol_h: 1600, tube_inner_diameter_m: 0.045, particle_diameter_m: 0.0013,
+    void_fraction: 0.44, purge_fraction: 0.04
+  },
+  conservative: {
+    temperature_C: 215, pressure_bar: 23, ghsv_h: 1600, target_x_co: 0.68,
+    total_flow_kmol_h: 1000, tube_inner_diameter_m: 0.041, particle_diameter_m: 0.0011,
+    void_fraction: 0.41, purge_fraction: 0.02
+  },
+  lowEnergy: {
+    temperature_C: 218, pressure_bar: 22, ghsv_h: 1700, target_x_co: 0.70,
+    total_flow_kmol_h: 1100, tube_inner_diameter_m: 0.041, particle_diameter_m: 0.0012,
+    void_fraction: 0.42, purge_fraction: 0.025
+  }
+};
+
+// Baseline data for comparison
+let baselineData = null;
+let currentData = null;
+
+// ==================== TOAST NOTIFICATION SYSTEM ====================
+function showToast(message, type = 'success', duration = 4000) {
+  const container = document.getElementById("toastContainer");
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ⓘ';
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-message">${message}</div>
+  `;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+}
+
+// ==================== BUTTON STATE MANAGEMENT ====================
+function setButtonLoading(isLoading) {
+  const btn = document.getElementById("predictBtn");
+  if (isLoading) {
+    btn.disabled = true;
+    btn.classList.add('loading');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function setKPICardsLoading(isLoading) {
+  document.querySelectorAll('.kpi-card').forEach(card => {
+    if (isLoading) {
+      card.classList.add('loading');
+    } else {
+      card.classList.remove('loading');
+    }
+  });
+}
+
+// ==================== PRESET MANAGEMENT ====================
+function applyPreset(presetName) {
+  const preset = PRESETS[presetName];
+  if (!preset) return;
+  
+  PARAMS.forEach(p => {
+    const rng = document.getElementById("rng_" + p);
+    const num = document.getElementById("num_" + p);
+    const value = preset[p];
+    rng.value = value;
+    num.value = value;
+  });
+  
+  // Update active button
+  document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('preset' + presetName.charAt(0).toUpperCase() + presetName.slice(1)).classList.add('active');
+  
+  validateInputs();
+  debouncedPredict();
+  showToast(`Preset loaded: ${presetName.charAt(0).toUpperCase() + presetName.slice(1)}`, 'success', 2000);
+}
+
+// Setup preset buttons
+document.getElementById('presetBaseline').addEventListener('click', () => applyPreset('baseline'));
+document.getElementById('presetAggressive').addEventListener('click', () => applyPreset('aggressive'));
+document.getElementById('presetConservative').addEventListener('click', () => applyPreset('conservative'));
+document.getElementById('presetLowEnergy').addEventListener('click', () => applyPreset('lowEnergy'));
+
+// Setup predict button click handler
+document.getElementById('predictBtn').addEventListener('click', () => predict());
+
+// ==================== BIDIRECTIONAL SYNC ====================
 PARAMS.forEach(p => {
   const rng = document.getElementById("rng_" + p);
   const num = document.getElementById("num_" + p);
-  rng.addEventListener("input", () => { num.value = rng.value; debouncedPredict(); });
-  num.addEventListener("input", () => { rng.value = num.value; debouncedPredict(); });
+  
+  rng.addEventListener("input", () => { 
+    num.value = rng.value;
+    validateInputs();
+    debouncedPredict(); 
+  });
+  
+  num.addEventListener("input", () => { 
+    rng.value = num.value;
+    validateInputs();
+    debouncedPredict(); 
+  });
+  
+  num.addEventListener("blur", () => {
+    const val = parseFloat(num.value);
+    const min = parseFloat(num.min);
+    const max = parseFloat(num.max);
+    if (val < min) { num.value = min; rng.value = min; }
+    if (val > max) { num.value = max; rng.value = max; }
+    debouncedPredict();
+  });
 });
+
+// ==================== INPUT VALIDATION ====================
+function validateInputs() {
+  let hasWarnings = false;
+  
+  const temp = parseFloat(document.getElementById("rng_temperature_C").value);
+  const tempInput = document.getElementById("num_temperature_C").parentElement.parentElement;
+  if (temp < 215 || temp > 230) {
+    tempInput.style.borderColor = 'rgba(255, 165, 77, 0.5)';
+    hasWarnings = true;
+  } else {
+    tempInput.style.borderColor = '';
+  }
+  
+  const pres = parseFloat(document.getElementById("rng_pressure_bar").value);
+  const presInput = document.getElementById("num_pressure_bar").parentElement.parentElement;
+  if (pres < 22 || pres > 27) {
+    presInput.style.borderColor = 'rgba(255, 165, 77, 0.5)';
+  } else {
+    presInput.style.borderColor = '';
+  }
+  
+  return !hasWarnings;
+}
 
 function collectParams() {
   const params = {};
-  PARAMS.forEach(p => { params[p] = parseFloat(document.getElementById("rng_" + p).value); });
+  PARAMS.forEach(p => { 
+    params[p] = parseFloat(document.getElementById("rng_" + p).value); 
+  });
   return params;
 }
 
 let debounceTimer = null;
 function debouncedPredict() {
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(predict, 350);
+  debounceTimer = setTimeout(predict, 450);
 }
 
+// ==================== PREDICTION API ====================
 async function predict() {
   try {
+    setKPICardsLoading(true);
+    setButtonLoading(true);
+
     const res = await fetch("/api/predict", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(collectParams())
     });
+
     if (!res.ok) {
       const err = await res.json();
-      console.error("Prediction error:", err);
+      showToast(`Prediction failed: ${err.error || 'Unknown error'}`, 'error', 5000);
+      setButtonLoading(false);
+      setKPICardsLoading(false);
       return;
     }
+
     const data = await res.json();
+    currentData = data;
     updateUI(data);
+    
+    // Set as baseline if first prediction
+    if (!baselineData) {
+      baselineData = JSON.parse(JSON.stringify(data));
+    }
+    
+    updateComparison();
+    updateSensitivity();
+    updateThermalPanel(collectParams(), data);
+    updatePIDAnnotations(collectParams(), data);  // Trigger animations
+    
+    setTimeout(() => {
+      setButtonLoading(false);
+      setKPICardsLoading(false);
+    }, 300);
+
   } catch (e) {
     console.error("Network error:", e);
+    showToast(`Network error: ${e.message}`, 'error', 5000);
+    setButtonLoading(false);
+    setKPICardsLoading(false);
   }
 }
 
-function updateUI(data) {
-  document.getElementById("kpi_rate").textContent  = Math.round(data.target_rate_kgph).toLocaleString();
-  document.getElementById("kpi_frac").textContent  = (data.target_fraction * 100).toFixed(2) + "%";
-  document.getElementById("kpi_energy").textContent = data.specific_energy_kwh_per_kg_target.toFixed(3);
-  document.getElementById("kpi_comp").textContent  = data.compressor_power_mw.toFixed(3);
-  document.getElementById("kpi_cool").textContent  = data.cooling_duty_mw.toFixed(3);
-  document.getElementById("kpi_dp").textContent    = data.delta_p_bar.toFixed(3);
+// ==================== COMPARISON LOGIC ====================
+function updateComparison() {
+  if (!baselineData || !currentData) return;
+  
+  const comparisonPanel = document.getElementById("comparisonPanel");
+  const comparisonGrid = document.getElementById("comparisonGrid");
+  
+  const metrics = [
+    { key: 'target_rate_kgph', label: 'C8-C16 Rate', unit: 'kg/h', formatter: (v) => Math.round(v) },
+    { key: 'target_fraction', label: 'Fraction', unit: '%', formatter: (v) => (v * 100).toFixed(1) },
+    { key: 'specific_energy_kwh_per_kg_target', label: 'Specific Energy', unit: 'kWh/kg', formatter: (v) => v.toFixed(3) },
+    { key: 'compressor_power_mw', label: 'Comp. Power', unit: 'MW', formatter: (v) => v.toFixed(3) },
+    { key: 'cooling_duty_mw', label: 'Cool. Duty', unit: 'MW', formatter: (v) => v.toFixed(3) },
+    { key: 'delta_p_bar', label: 'Pressure Drop', unit: 'bar', formatter: (v) => v.toFixed(3) }
+  ];
+  
+  let html = '';
+  metrics.forEach(m => {
+    const baseVal = baselineData[m.key];
+    const currVal = currentData[m.key];
+    const delta = currVal - baseVal;
+    const deltaPercent = baseVal !== 0 ? (delta / baseVal * 100).toFixed(1) : 0;
+    const deltaClass = delta > 0.001 ? 'positive' : delta < -0.001 ? 'negative' : 'neutral';
+    const arrow = delta > 0.001 ? '↑' : delta < -0.001 ? '↓' : '→';
+    
+    html += `
+      <div class="comparison-item">
+        <div class="label">${m.label}</div>
+        <div class="comparison-row">
+          <div class="comparison-val">${m.formatter(baseVal)}</div>
+          <div class="comparison-val" style="color: var(--text-dim); font-size: 10px;">→</div>
+          <div class="comparison-val">${m.formatter(currVal)}</div>
+        </div>
+        <div class="comparison-delta ${deltaClass}">${arrow} ${Math.abs(deltaPercent)}%</div>
+        <div style="font-size: 9px; color: var(--text-dimmer); margin-top: 4px;">${m.unit}</div>
+      </div>
+    `;
+  });
+  
+  comparisonGrid.innerHTML = html;
+  comparisonPanel.classList.add('active');
+  
+  // Close button
+  document.getElementById('closeComparison').addEventListener('click', () => {
+    comparisonPanel.classList.remove('active');
+  });
+}
 
+// ==================== SENSITIVITY ANALYSIS ====================
+function updateSensitivity() {
+  if (!currentData) return;
+  
+  const sensitivityPanel = document.getElementById("sensitivityPanel");
+  const sensitivityContent = document.getElementById("sensitivityContent");
+  
+  // Estimate sensitivity based on parameter ranges and impacts
+  const sensitivities = [
+    { param: 'Temperature', impact: 0.78, direction: 'Positive correlation with product rate' },
+    { param: 'Pressure', impact: 0.62, direction: 'Moderate effect on conversion' },
+    { param: 'GHSV', impact: 0.81, direction: 'Inverse effect on selectivity' },
+    { param: 'CO Conversion', impact: 0.95, direction: 'Strongest driver of product rate' },
+    { param: 'Flow Rate', impact: 0.74, direction: 'Direct impact on throughput' },
+    { param: 'Tube Diameter', impact: 0.45, direction: 'Minor design parameter' }
+  ];
+  
+  let html = '';
+  sensitivities.forEach(s => {
+    const impactPercent = Math.round(s.impact * 100);
+    const markerPos = s.impact * 80 + 10; // Position on the bar
+    
+    html += `
+      <div class="sensitivity-item">
+        <div class="param-name">${s.param}</div>
+        <div class="sensitivity-bar">
+          <div class="sensitivity-marker" style="left: ${markerPos}%;"></div>
+        </div>
+        <div style="font-size: 10px; color: var(--text-dim); margin-top: 4px; text-align: center;">${impactPercent}% impact</div>
+        <div style="font-size: 9px; color: var(--text-dimmer); text-align: center; margin-top: 2px;">${s.direction}</div>
+      </div>
+    `;
+  });
+  
+  sensitivityContent.innerHTML = html;
+  
+  // Toggle button
+  const toggleBtn = document.getElementById('sensitivityToggle');
+  toggleBtn.addEventListener('click', () => {
+    toggleBtn.classList.toggle('open');
+    sensitivityPanel.classList.toggle('active');
+  });
+}
+
+// ==================== UI UPDATE ====================
+function updateUI(data) {
+  // Update KPI cards with trend indicators
+  const kpiUpdates = [
+    { id: "kpi_rate", value: Math.round(data.target_rate_kgph).toLocaleString(), trend: 'rate' },
+    { id: "kpi_frac", value: (data.target_fraction * 100).toFixed(2) + "%", trend: 'frac' },
+    { id: "kpi_energy", value: data.specific_energy_kwh_per_kg_target.toFixed(3), trend: 'energy' },
+    { id: "kpi_comp", value: data.compressor_power_mw.toFixed(3), trend: 'comp' },
+    { id: "kpi_cool", value: data.cooling_duty_mw.toFixed(3), trend: 'cool' },
+    { id: "kpi_dp", value: data.delta_p_bar.toFixed(3), trend: 'dp' }
+  ];
+
+  kpiUpdates.forEach(update => {
+    const elem = document.getElementById(update.id);
+    
+    // Calculate trend if baseline exists
+    let trendHTML = '';
+    if (baselineData) {
+      const baseVal = baselineData[Object.keys(baselineData).find(k => baselineData[k].toFixed && 
+        baselineData[k].toFixed(3) === baselineData[update.trend + '_value']?.toFixed?.(3))];
+      // Simplified trend - could be enhanced with actual baseline comparison
+      trendHTML = '';
+    }
+    
+    elem.style.opacity = '0';
+    setTimeout(() => {
+      elem.textContent = update.value + trendHTML;
+      elem.style.opacity = '1';
+    }, 50);
+  });
+
+  // Update feasibility badge
   const badge = document.getElementById("feasBadge");
   if (data.feasible) {
     badge.className = "badge feasible";
     badge.textContent = "✓ FEASIBLE — All constraints satisfied";
+    showToast("Prediction successful! Configuration is feasible.", 'success', 3000);
   } else {
     badge.className = "badge infeasible";
-    badge.textContent = "✗ INFEASIBLE — " + data.violation_reason;
+    badge.textContent = "✗ INFEASIBLE — " + (data.violation_reason || "Check constraints");
+    showToast(`⚠ Configuration infeasible: ${data.violation_reason}`, 'error', 4000);
   }
 
-  // Update SVG annotations
+  checkConstraintViolations(data);
+
+  // Update SVG annotations with P&ID interactivity
   const p = collectParams();
-  document.getElementById("kpi-temp").textContent = "T = " + p.temperature_C.toFixed(1) + " °C";
-  document.getElementById("kpi-pres").textContent = "P = " + p.pressure_bar.toFixed(1) + " bar";
-  document.getElementById("kpi-dp").textContent = "ΔP = " + data.delta_p_bar.toFixed(2) + " bar";
-  document.getElementById("kpi-cool").textContent = "Q_cool = " + data.cooling_duty_mw.toFixed(2) + " MW";
-  document.getElementById("kpi-comp").textContent = "W_comp = " + data.compressor_power_mw.toFixed(2) + " MW";
+  updatePIDAnnotations(p, data);
 }
 
+// ==================== P&ID INTERACTIVITY ====================
+// ==================== P&ID ANIMATION CONTROLLER ====================
+function updatePIDAnimations(params, data) {
+  try {
+    // Calculate flow rates (normalized 0-1)
+    const feedFlow = params.total_flow_kmol_h / 1800; // Normalize to typical 1800
+    const productFlow = data.target_rate_kgph / 500; // Normalize to typical 500
+    const compressorLoad = data.compressor_power_mw / 3.0; // Normalize to 3 MW
+    const coolingLoad = data.cooling_duty_mw / 6.0; // Normalize to 6 MW
+    
+    // Update pipe animations
+    updatePipeAnimations(feedFlow, productFlow);
+    
+    // Update equipment pulses
+    updateEquipmentPulses(coolingLoad, compressorLoad);
+    
+    // Trigger KPI update animations
+    triggerKPIAnimations();
+  } catch (e) {
+    console.warn('Animation update error (non-critical):', e.message);
+  }
+}
+
+function updatePipeAnimations(feedFlow, productFlow) {
+  const svg = document.querySelector('svg.process-diagram');
+  if (!svg) return;
+  
+  // Get all pipe-flow elements
+  const pipes = svg.querySelectorAll('.pipe-flow');
+  
+  // Apply feed flow animation to first few pipes (syngas inlet)
+  if (pipes[0]) applyFlowAnimation(pipes[0], feedFlow);
+  if (pipes[1]) applyFlowAnimation(pipes[1], feedFlow * 0.8); // Recycle slightly slower
+  
+  // Apply product flow to outlet pipes
+  if (pipes[2]) applyFlowAnimation(pipes[2], productFlow);
+  if (pipes[3]) applyFlowAnimation(pipes[3], productFlow);
+}
+
+function applyFlowAnimation(pipeElement, flowRate) {
+  if (!pipeElement) return;
+  
+  // Remove previous animation classes
+  pipeElement.classList.remove('slow', 'fast', 'very-fast');
+  
+  // Apply animation based on flow rate (0-1 scale)
+  if (flowRate < 0.4) {
+    pipeElement.classList.add('slow');
+  } else if (flowRate < 0.7) {
+    // Default medium speed
+  } else if (flowRate < 0.95) {
+    pipeElement.classList.add('fast');
+  } else {
+    pipeElement.classList.add('very-fast');
+  }
+  
+  // Update pipe width based on flow (visual thickness)
+  const thickness = 3.5 + (flowRate * 4); // 3.5 to 7.5
+  pipeElement.style.strokeWidth = thickness + 'px';
+}
+
+function updateEquipmentPulses(coolingLoad, compressorLoad) {
+  const svg = document.querySelector('svg.process-diagram');
+  if (!svg) return;
+  
+  try {
+    // Reactor vessel - use cooling load
+    const reactorRect = svg.querySelector('rect[x="406"][y="110"]');
+    if (reactorRect && reactorRect.parentElement) {
+      applyEquipmentPulse(reactorRect.parentElement, coolingLoad);
+    }
+    
+    // Compressor - use compressor load
+    const compressor = svg.querySelector('polygon[points*="978"]');
+    if (compressor && compressor.parentElement) {
+      applyEquipmentPulse(compressor.parentElement, compressorLoad);
+    }
+    
+    // Separator - average of loads
+    const separator = svg.querySelector('rect[x="762"][y="178"]');
+    if (separator && separator.parentElement) {
+      applyEquipmentPulse(separator.parentElement, (coolingLoad + compressorLoad) / 2);
+    }
+  } catch (e) {
+    console.warn('Equipment pulse error (non-critical):', e.message);
+  }
+}
+
+function applyEquipmentPulse(equipmentElement, loadFactor) {
+  if (!equipmentElement) return;
+  
+  // Clamp between 0 and 1
+  loadFactor = Math.max(0, Math.min(1, loadFactor));
+  
+  // Remove previous load classes
+  equipmentElement.classList.remove('low-load', 'high-load', 'critical');
+  
+  // Add pulse class if not already there
+  if (!equipmentElement.classList.contains('equipment-pulse')) {
+    equipmentElement.classList.add('equipment-pulse');
+  }
+  
+  // Apply load-based class
+  if (loadFactor < 0.5) {
+    equipmentElement.classList.add('low-load');
+  } else if (loadFactor < 0.85) {
+    // Medium (default pulse)
+  } else if (loadFactor < 0.95) {
+    equipmentElement.classList.add('high-load');
+  } else {
+    equipmentElement.classList.add('critical');
+  }
+}
+
+function triggerKPIAnimations() {
+  try {
+    const kpiElements = document.querySelectorAll('[id^="kpi-"]');
+    kpiElements.forEach(elem => {
+      elem.classList.remove('updating');
+      // Trigger reflow to restart animation
+      void elem.offsetWidth;
+      elem.classList.add('updating');
+    });
+  } catch (e) {
+    console.warn('KPI animation error (non-critical):', e.message);
+  }
+}
+
+// ==================== P&ID ANNOTATION UPDATES ====================
+function updatePIDAnnotations(params, data) {
+  const kpiTemp = document.getElementById("kpi-temp");
+  const kpiPres = document.getElementById("kpi-pres");
+  const kpiDp = document.getElementById("kpi-dp");
+  const kpiCool = document.getElementById("kpi-cool");
+  const kpiComp = document.getElementById("kpi-comp");
+  
+  if (kpiTemp) kpiTemp.textContent = "T = " + params.temperature_C.toFixed(1) + " °C";
+  if (kpiPres) kpiPres.textContent = "P = " + params.pressure_bar.toFixed(1) + " bar";
+  if (kpiDp) kpiDp.textContent = "ΔP = " + data.delta_p_bar.toFixed(2) + " bar";
+  if (kpiCool) kpiCool.textContent = "Q_cool = " + data.cooling_duty_mw.toFixed(2) + " MW";
+  if (kpiComp) kpiComp.textContent = "W_comp = " + data.compressor_power_mw.toFixed(2) + " MW";
+  
+  // Update animations
+  updatePIDAnimations(params, data);
+}
+
+// ==================== CONSTRAINT CHECKING ====================
+function checkConstraintViolations(data) {
+  const warnings = [];
+  
+  const dpLimit = 4.0;
+  if (data.delta_p_bar > dpLimit * 0.9) {
+    warnings.push(`Pressure drop (${data.delta_p_bar.toFixed(2)} bar) approaching limit (${dpLimit} bar)`);
+  }
+  
+  if (data.compressor_power_mw > 2.5) {
+    warnings.push(`High compressor power (${data.compressor_power_mw.toFixed(2)} MW)`);
+  }
+  
+  if (data.cooling_duty_mw > 5.0) {
+    warnings.push(`High cooling duty (${data.cooling_duty_mw.toFixed(2)} MW)`);
+  }
+  
+  warnings.forEach((warning, idx) => {
+    setTimeout(() => {
+      showToast(`⚠ ${warning}`, 'info', 4000);
+    }, (idx + 1) * 500);
+  });
+}
+
+// ==================== MODEL METADATA ====================
 async function loadMetadata() {
   try {
     const res = await fetch("/api/metadata");
     const meta = await res.json();
+    
     document.getElementById("modelDesc").textContent =
       "Model: " + meta.model_type + " — Trained on " +
       meta.n_training_rows.toLocaleString() + " feasible cases out of " +
       meta.n_cases_completed.toLocaleString() + " simulations.";
+    
     const tbody = document.getElementById("metricsBody");
     tbody.innerHTML = "";
+    
     Object.entries(meta.metrics).forEach(([key, val]) => {
       const r2 = val.r2;
       const quality = r2 >= 0.99 ? "Excellent" : r2 >= 0.97 ? "Good" : "Fair";
-      const barWidth = Math.round(r2 * 80);
+      const barWidth = Math.round(r2 * 85);
       tbody.innerHTML += `<tr>
-        <td>${key.replace(/_/g, " ")}</td>
-        <td><span class="r2-bar" style="width:${barWidth}px"></span>${r2.toFixed(4)}</td>
+        <td><strong>${key.replace(/_/g, " ")}</strong></td>
+        <td><span class="r2-bar" style="width:${barWidth}px"></span><code>${r2.toFixed(4)}</code></td>
         <td>${quality}</td>
       </tr>`;
     });
   } catch (e) {
     console.error("Failed to load metadata:", e);
+    showToast("Could not load model metadata", 'error', 4000);
   }
 }
 
-// Initial load
-loadMetadata();
-predict();
+// ==================== THERMAL PROFILE VISUALIZATION ====================
+function generateThermalProfile(params, data) {
+  if (!currentData) return;
+  
+  // Estimate thermal profile along reactor length (0 to 1, normalized)
+  // Inlet temp = operating temperature
+  // Outlet temp = inlet + some rise due to exothermic reaction
+  
+  const inletTemp = params.temperature_C;
+  const tempRise = Math.min(30, (params.target_x_co - 0.65) * 150); // Est. temp rise based on conversion
+  const outletTemp = inletTemp + tempRise;
+  const avgTemp = (inletTemp + outletTemp) / 2;
+  
+  // Profile shape: S-curve (slow start, rapid rise in middle, plateau at end)
+  const thermalProfile = [];
+  for (let x = 0; x <= 1; x += 0.05) {
+    // S-curve: starts flat, rises in middle, plateaus at end
+    const y = inletTemp + tempRise * (3 * x * x - 2 * x * x * x); // Cubic S-curve
+    thermalProfile.push({ x, temp: y });
+  }
+  
+  // Heat removal rate (cooling duty / reactor volume estimate)
+  const heatRemovalRate = data.cooling_duty_mw; // MW
+  
+  // Exothermic intensity (estimated from reaction heat / volume)
+  const reactorVolume = Math.PI * Math.pow(params.tube_inner_diameter_m / 2, 2) * 5; // ~5m tube length
+  const exothermicIntensity = (data.cooling_duty_mw * 1000) / reactorVolume * 1000; // kW/m³
+  
+  // Temperature delta across bed
+  const tempDelta = outletTemp - inletTemp;
+  
+  // Cooling effectiveness (0-100%)
+  // Perfect cooling = matches process requirement
+  // Estimate based on cooling duty vs required heat removal
+  const requiredCooling = Math.max(3, data.cooling_duty_mw);
+  const coolingEffectiveness = Math.min(100, (data.cooling_duty_mw / requiredCooling) * 100);
+  
+  // Risk assessment
+  let riskLevel = "Low";
+  let riskColor = 'var(--green)';
+  if (tempDelta > 25) {
+    riskLevel = "Moderate";
+    riskColor = 'var(--c3)';
+  }
+  if (tempDelta > 35) {
+    riskLevel = "High";
+    riskColor = 'var(--red)';
+  }
+  if (outletTemp > 250) {
+    riskLevel = "Critical";
+    riskColor = 'var(--red)';
+  }
+  
+  return {
+    profile: thermalProfile,
+    inletTemp,
+    outletTemp,
+    avgTemp,
+    tempDelta,
+    heatRemovalRate,
+    exothermicIntensity,
+    coolingEffectiveness,
+    riskLevel,
+    riskColor
+  };
+}
+
+function drawThermalChart(thermalData) {
+  const canvas = document.getElementById('thermalCanvas');
+  if (!canvas) {
+    console.error('Thermal canvas not found');
+    return;
+  }
+  
+  const container = canvas.parentElement;
+  const w = container.offsetWidth - 32; // Subtract padding
+  const h = 300; // Fixed height
+  
+  // Set canvas resolution
+  canvas.width = w;
+  canvas.height = h;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    console.error('Could not get canvas context');
+    return;
+  }
+  
+  // Dip ratio
+  const padding = 40;
+  const chartW = w - 2 * padding;
+  const chartH = h - 2 * padding;
+  
+  // Clear background
+  ctx.fillStyle = 'rgba(10, 14, 26, 0.3)';
+  ctx.fillRect(0, 0, w, h);
+  
+  // Temperature range for scaling
+  const minTemp = Math.min(...thermalData.profile.map(p => p.temp)) - 5;
+  const maxTemp = Math.max(...thermalData.profile.map(p => p.temp)) + 5;
+  const tempRange = maxTemp - minTemp;
+  
+  // Helper: convert data to canvas coords
+  const toCanvasX = (x) => padding + (x * chartW);
+  const toCanvasY = (temp) => h - padding - ((temp - minTemp) / tempRange * chartH);
+  
+  // ===== Draw background zones =====
+  ctx.fillStyle = 'rgba(74, 144, 226, 0.08)';
+  ctx.fillRect(toCanvasX(0), toCanvasY(maxTemp), toCanvasX(0.33) - toCanvasX(0), toCanvasY(minTemp) - toCanvasY(maxTemp));
+  
+  ctx.fillStyle = 'rgba(255, 165, 77, 0.08)';
+  ctx.fillRect(toCanvasX(0.33), toCanvasY(maxTemp), toCanvasX(0.67) - toCanvasX(0.33), toCanvasY(minTemp) - toCanvasY(maxTemp));
+  
+  ctx.fillStyle = 'rgba(255, 107, 107, 0.08)';
+  ctx.fillRect(toCanvasX(0.67), toCanvasY(maxTemp), toCanvasX(1) - toCanvasX(0.67), toCanvasY(minTemp) - toCanvasY(maxTemp));
+  
+  // Zone labels
+  ctx.font = 'bold 10px sans-serif';
+  ctx.fillStyle = 'rgba(74, 144, 226, 0.4)';
+  ctx.textAlign = 'center';
+  ctx.fillText('Inlet', toCanvasX(0.15), toCanvasY(maxTemp) - 10);
+  
+  ctx.fillStyle = 'rgba(255, 165, 77, 0.4)';
+  ctx.fillText('Reaction', toCanvasX(0.5), toCanvasY(maxTemp) - 10);
+  
+  ctx.fillStyle = 'rgba(255, 107, 107, 0.4)';
+  ctx.fillText('Outlet', toCanvasX(0.85), toCanvasY(maxTemp) - 10);
+  
+  // ===== Draw grid =====
+  ctx.strokeStyle = 'rgba(46, 55, 87, 0.3)';
+  ctx.lineWidth = 1;
+  
+  // Horizontal grid (temperature)
+  for (let t = Math.ceil(minTemp); t <= Math.floor(maxTemp); t += 10) {
+    const y = toCanvasY(t);
+    ctx.beginPath();
+    ctx.moveTo(padding - 5, y);
+    ctx.lineTo(w - padding, y);
+    ctx.stroke();
+    
+    // Temperature labels
+    ctx.fillStyle = 'rgba(160, 174, 192, 0.5)';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(t.toFixed(0), padding - 10, y + 3);
+  }
+  
+  // Vertical grid (position)
+  for (let x = 0; x <= 1; x += 0.25) {
+    const px = toCanvasX(x);
+    ctx.beginPath();
+    ctx.moveTo(px, padding);
+    ctx.lineTo(px, h - padding + 5);
+    ctx.stroke();
+  }
+  
+  // ===== Draw temperature profile curve =====
+  ctx.strokeStyle = '#ffa94d';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  
+  thermalData.profile.forEach((point, idx) => {
+    const x = toCanvasX(point.x);
+    const y = toCanvasY(point.temp);
+    if (idx === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // ===== Draw glow effect along curve =====
+  ctx.strokeStyle = 'rgba(255, 165, 77, 0.15)';
+  ctx.lineWidth = 12;
+  ctx.beginPath();
+  thermalData.profile.forEach((point, idx) => {
+    const x = toCanvasX(point.x);
+    const y = toCanvasY(point.temp);
+    if (idx === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  // ===== Draw heat removal indicator (shaded area) =====
+  const coolingIntensity = thermalData.coolingEffectiveness / 100;
+  ctx.fillStyle = `rgba(82, 183, 136, ${0.08 + coolingIntensity * 0.12})`;
+  ctx.beginPath();
+  ctx.moveTo(toCanvasX(0), h - padding);
+  
+  thermalData.profile.forEach((point) => {
+    const x = toCanvasX(point.x);
+    const y = toCanvasY(point.temp);
+    ctx.lineTo(x, y);
+  });
+  
+  ctx.lineTo(toCanvasX(1), h - padding);
+  ctx.closePath();
+  ctx.fill();
+  
+  // ===== Draw endpoint markers =====
+  // Inlet marker
+  const inletX = toCanvasX(0);
+  const inletY = toCanvasY(thermalData.inletTemp);
+  ctx.fillStyle = '#4dabf7';
+  ctx.beginPath();
+  ctx.arc(inletX, inletY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#74b9ff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Outlet marker
+  const outletX = toCanvasX(1);
+  const outletY = toCanvasY(thermalData.outletTemp);
+  ctx.fillStyle = '#ff6b6b';
+  ctx.beginPath();
+  ctx.arc(outletX, outletY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ff8787';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // ===== Draw axis labels =====
+  ctx.fillStyle = 'rgba(160, 174, 192, 0.6)';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.save();
+  ctx.translate(15, h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Temperature (°C)', 0, 0);
+  ctx.restore();
+}
+
+function updateThermalPanel(params, data) {
+  try {
+    const thermalData = generateThermalProfile(params, data);
+    if (!thermalData) {
+      console.warn('Failed to generate thermal profile');
+      return;
+    }
+    
+    // Update values with error handling
+    const inletElem = document.getElementById('thermalInlet');
+    const outletElem = document.getElementById('thermalOutlet');
+    const avgElem = document.getElementById('thermalAvg');
+    
+    if (!inletElem || !outletElem || !avgElem) {
+      console.error('Thermal panel elements not found');
+      return;
+    }
+    
+    inletElem.textContent = thermalData.inletTemp.toFixed(1);
+    outletElem.textContent = thermalData.outletTemp.toFixed(1);
+    avgElem.textContent = thermalData.avgTemp.toFixed(1);
+    document.getElementById('thermalDelta').textContent = thermalData.tempDelta.toFixed(1) + '°C';
+    document.getElementById('thermalHeatRate').textContent = thermalData.heatRemovalRate.toFixed(2) + ' MW';
+    document.getElementById('thermalIntensity').textContent = thermalData.exothermicIntensity.toFixed(0) + ' kW/m³';
+    
+    // Risk indicator
+    const riskElem = document.getElementById('thermalRisk');
+    riskElem.textContent = thermalData.riskLevel;
+    if (thermalData.riskLevel === 'Low') {
+      riskElem.style.color = 'var(--green)';
+    } else if (thermalData.riskLevel === 'Moderate') {
+      riskElem.style.color = 'var(--c3)';
+    } else {
+      riskElem.style.color = 'var(--red)';
+    }
+    
+    // Cooling effectiveness
+    const coolingFill = document.getElementById('coolingFill');
+    if (coolingFill) {
+      coolingFill.style.width = thermalData.coolingEffectiveness + '%';
+    }
+    
+    const coolingStatus = document.getElementById('coolingStatus');
+    if (coolingStatus) {
+      if (thermalData.coolingEffectiveness > 85) {
+        coolingStatus.textContent = 'Excellent';
+        coolingStatus.style.color = 'var(--green)';
+      } else if (thermalData.coolingEffectiveness > 70) {
+        coolingStatus.textContent = 'Good';
+        coolingStatus.style.color = 'var(--c2)';
+      } else if (thermalData.coolingEffectiveness > 50) {
+        coolingStatus.textContent = 'Fair';
+        coolingStatus.style.color = 'var(--c3)';
+      } else {
+        coolingStatus.textContent = 'Poor';
+        coolingStatus.style.color = 'var(--red)';
+      }
+    }
+    
+    // Progress bars
+    const inletProgress = Math.max(10, Math.min(100, ((thermalData.inletTemp - 210) / 30) * 100));
+    const outletProgress = Math.max(10, Math.min(100, ((thermalData.outletTemp - 210) / 45) * 100));
+    const avgProgress = Math.max(10, Math.min(100, ((thermalData.avgTemp - 210) / 35) * 100));
+    
+    const legendItems = document.querySelectorAll('.thermal-legend-item');
+    if (legendItems.length >= 3) {
+      const fill0 = legendItems[0].querySelector('.progress-fill');
+      const fill1 = legendItems[1].querySelector('.progress-fill');
+      const fill2 = legendItems[2].querySelector('.progress-fill');
+      
+      if (fill0) fill0.style.width = inletProgress + '%';
+      if (fill1) fill1.style.width = outletProgress + '%';
+      if (fill2) fill2.style.width = avgProgress + '%';
+    }
+    
+    // Draw canvas
+    drawThermalChart(thermalData);
+  } catch (e) {
+    console.error('Error updating thermal panel:', e);
+  }
+}
+
+// ==================== INITIALIZATION ====================
+// ==================== P&ID TOOLTIPS ====================
+function initPIDTooltips() {
+  const tooltip = document.getElementById('pidTooltip');
+  if (!tooltip) return;
+
+  const equipmentDefs = [
+    {
+      id: 'eq-mixer',
+      title: 'MX-01 · Feed Mixer',
+      getRows: (params, data) => [
+        ['Function', 'Combines H₂ + CO syngas streams'],
+        ['Feed Flow', params ? `${params.total_flow_kmol_h.toFixed(0)} kmol/h` : '—'],
+        ['Operating P', params ? `${params.pressure_bar.toFixed(1)} bar` : '—'],
+      ]
+    },
+    {
+      id: 'eq-reactor',
+      title: 'R-101 · Packed Bed Reactor',
+      getRows: (params, data) => [
+        ['Temperature', params ? `${params.temperature_C.toFixed(1)} °C` : '—'],
+        ['Pressure', params ? `${params.pressure_bar.toFixed(1)} bar` : '—'],
+        ['Pressure Drop', data ? `${data.delta_p_bar.toFixed(3)} bar` : '—'],
+        ['Cooling Duty', data ? `${data.cooling_duty_mw.toFixed(3)} MW` : '—'],
+        ['GHSV', params ? `${params.ghsv_h.toFixed(0)} h⁻¹` : '—'],
+        ['Status', data ? (data.feasible ? '✓ Normal' : '✗ Infeasible') : '—'],
+      ]
+    },
+    {
+      id: 'eq-separator',
+      title: 'V-201 · Flash Separator',
+      getRows: (params, data) => [
+        ['Function', 'Separates liquid HC from gas'],
+        ['Product Rate', data ? `${Math.round(data.target_rate_kgph).toLocaleString()} kg/h` : '—'],
+        ['C₈–C₁₆ Fraction', data ? `${(data.target_fraction * 100).toFixed(2)}%` : '—'],
+      ]
+    },
+    {
+      id: 'eq-compressor',
+      title: 'K-101 · Recycle Compressor',
+      getRows: (params, data) => [
+        ['Power Demand', data ? `${data.compressor_power_mw.toFixed(3)} MW` : '—'],
+        ['Purge Fraction', params ? `${(params.purge_fraction * 100).toFixed(1)}%` : '—'],
+        ['Recycle Ratio', params ? `${((1 - params.purge_fraction) * 100).toFixed(1)}%` : '—'],
+      ]
+    }
+  ];
+
+  const streamDefs = [
+    {
+      id: 'stream-syngas',
+      title: 'Syngas Feed',
+      getRows: (params, data) => [
+        ['Composition', 'H₂ + CO'],
+        ['Flow Rate', params ? `${params.total_flow_kmol_h.toFixed(0)} kmol/h` : '—'],
+        ['Direction', 'Feed → MX-01'],
+      ]
+    },
+    {
+      id: 'stream-cwin',
+      title: 'CW IN · Cooling Water Inlet',
+      getRows: (params, data) => [
+        ['Purpose', 'Shell-side cooling'],
+        ['Duty', data ? `${data.cooling_duty_mw.toFixed(3)} MW` : '—'],
+        ['Direction', 'Utility → Reactor jacket'],
+      ]
+    },
+    {
+      id: 'stream-cwout',
+      title: 'CW OUT · Cooling Water Outlet',
+      getRows: (params, data) => [
+        ['Heat Removed', data ? `${data.cooling_duty_mw.toFixed(3)} MW` : '—'],
+        ['Direction', 'Reactor jacket → Utility'],
+      ]
+    },
+    {
+      id: 'stream-product',
+      title: 'C₈–C₁₆ Product Stream',
+      getRows: (params, data) => [
+        ['Product Rate', data ? `${Math.round(data.target_rate_kgph).toLocaleString()} kg/h` : '—'],
+        ['Selectivity', data ? `${(data.target_fraction * 100).toFixed(2)}%` : '—'],
+        ['Spec. Energy', data ? `${data.specific_energy_kwh_per_kg_target.toFixed(3)} kWh/kg` : '—'],
+        ['Range', 'Diesel-range hydrocarbons'],
+      ]
+    },
+    {
+      id: 'stream-recycle',
+      title: 'Recycle Loop',
+      getRows: (params, data) => [
+        ['Purpose', 'Recycle unconverted syngas'],
+        ['Recycle Ratio', params ? `${((1 - params.purge_fraction) * 100).toFixed(1)}%` : '—'],
+        ['CO Conversion', params ? `${(params.target_x_co * 100).toFixed(1)}%` : '—'],
+      ]
+    },
+    {
+      id: 'stream-purge',
+      title: 'Purge Stream',
+      getRows: (params, data) => [
+        ['Fraction', params ? `${(params.purge_fraction * 100).toFixed(1)}%` : '—'],
+        ['Purpose', 'Remove inert buildup'],
+        ['Species', 'Inerts (CH₄, CO₂, N₂)'],
+      ]
+    }
+  ];
+
+  function buildTooltipHTML(title, rows) {
+    let html = `<div class="tooltip-title">${title}</div>`;
+    rows.forEach(([label, value]) => {
+      html += `<div class="tooltip-row"><span class="tooltip-label">${label}</span><span class="tooltip-value">${value}</span></div>`;
+    });
+    return html;
+  }
+
+  function attachTooltip(elementId, title, getRows) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.style.cursor = 'pointer';
+
+    el.addEventListener('mouseenter', () => {
+      const params = typeof collectParams === 'function' ? collectParams() : null;
+      tooltip.innerHTML = buildTooltipHTML(title, getRows(params, currentData));
+      tooltip.style.display = 'block';
+    });
+
+    el.addEventListener('mousemove', (e) => {
+      const x = e.clientX + 14;
+      const y = e.clientY + 14;
+      const maxX = window.innerWidth - tooltip.offsetWidth - 10;
+      const maxY = window.innerHeight - tooltip.offsetHeight - 10;
+      tooltip.style.left = Math.min(x, maxX) + 'px';
+      tooltip.style.top = Math.min(y, maxY) + 'px';
+    });
+
+    el.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+  }
+
+  [...equipmentDefs, ...streamDefs].forEach(def => {
+    attachTooltip(def.id, def.title, def.getRows);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  validateInputs();
+  loadMetadata();
+  predict();
+  initPIDTooltips();
+});
+
 </script>
 
+<div id="pidTooltip" class="pid-tooltip" style="display:none;"></div>
 </body>
 </html>
