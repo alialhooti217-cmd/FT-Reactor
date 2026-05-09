@@ -12,6 +12,7 @@ matplotlib>=3.7
 # Web dashboard
 streamlit>=1.35
 flask>=3.0
+gunicorn>=21.0
 
 # Terminal UI
 rich>=13.0
